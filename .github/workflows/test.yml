@@ -73,12 +73,17 @@ jobs:
             file $exe_file
             file $exe_file | grep $exe_type || exit 1
 
-            # can't be less than a meg
+            # can't be less than a meg and not more than 10 megs
+            # (fairly arbitrary, but we want to make sure it's size is reasonable)
             filesize=$(stat -c %s $exe_file)
             echo "File size: $filesize bytes"
             if [ $filesize -lt 1048576 ]; then
               echo "File is less than 1MB."
               exit 1
             fi
+            if [ $filesize -gt 10485760 ]; then
+              echo "File is more than 10MB."
+              exit 1
+            fi
 
-            ./$exe_file
+            ./$exe_file | tee | grep PASS || exit 1
