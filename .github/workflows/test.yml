@@ -74,7 +74,11 @@ jobs:
             file $exe_file | grep $exe_type || exit 1
 
             # can't be less than a meg
-            ls --size $exe_file
-            ls --size $exe_file | perl -lne'/(\d+)/; exit(1) if $1 < 1024' || exit 1
+            filesize=$(stat -c %s $exe_file)
+            echo "File size: $filesize bytes"
+            if [ $filesize -lt 1048576 ]; then
+              echo "File is less than 1MB."
+              exit 1
+            fi
 
             ./$exe_file
