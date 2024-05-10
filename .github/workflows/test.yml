@@ -75,7 +75,17 @@ jobs:
 
             # can't be less than a meg and not more than 10 megs
             # (fairly arbitrary, but we want to make sure it's size is reasonable)
-            filesize=$(stat -c %s $exe_file)
+
+            export filesize=0
+
+            if [ "${{ matrix.os }}" = "windows-latest" ]; then
+              export filesize=$(stat -c %s $exe_file)
+            elif [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
+              export filesize=$(stat -c %s $exe_file)
+            elif [ "${{ matrix.os }}" = "macos-latest" ]; then
+              export filesize=$(stat -f %z $exe_file)
+            fi
+
             echo "File size: $filesize bytes"
             if [ $filesize -lt 1048576 ]; then
               echo "File is less than 1MB."
