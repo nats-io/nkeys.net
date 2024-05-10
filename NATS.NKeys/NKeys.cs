@@ -96,13 +96,13 @@ namespace NATS.NKeys
         /// <returns></returns>
         public static byte[] Decode(string src)
         {
-            byte[] raw = Base32.Decode(src);
-            byte[] raw2 = Base32.FromBase32String(src);
-            ushort crc = (ushort)(raw[raw.Length - 2] | raw[raw.Length - 1] << 8);
+            var raw = Base32.Decode(src);
+            var raw2 = Base32.FromBase32String(src);
+            var crc = (ushort)(raw[raw.Length - 2] | raw[raw.Length - 1] << 8);
 
             // trim off the CRC16
-            int len = raw.Length - 2;
-            byte[] data = new byte[len];
+            var len = raw.Length - 2;
+            var data = new byte[len];
             Buffer.BlockCopy(raw, 0, data, 0, len);
 
             if (crc != Crc16.Checksum(data))
@@ -129,11 +129,11 @@ namespace NATS.NKeys
         {
             switch (prefixByte)
             {
-                case PrefixByteServer:   return PrefixType.Server;
-                case PrefixByteCluster:  return PrefixType.Cluster;
+                case PrefixByteServer: return PrefixType.Server;
+                case PrefixByteCluster: return PrefixType.Cluster;
                 case PrefixByteOperator: return PrefixType.Operator;
-                case PrefixByteAccount:  return PrefixType.Account;
-                case PrefixByteUser:     return PrefixType.User;
+                case PrefixByteAccount: return PrefixType.Account;
+                case PrefixByteUser: return PrefixType.User;
             }
             return null;
         }
@@ -164,7 +164,7 @@ namespace NATS.NKeys
         /// Wipes a string.
         /// </summary>
         /// <param name="src">string to wipe</param>
-        public static void Wipe(string src)
+        public static void Wipe(string? src)
         {
             // best effort to wipe.
             if (src != null && src.Length > 0)
@@ -180,15 +180,15 @@ namespace NATS.NKeys
         public static byte[] DecodeSeed(byte[] raw, out PrefixType type)
         {
             // Need to do the reverse here to get back to internal representation.
-            byte b1 = (byte)(raw[0] & 248);  // 248 = 11111000
-            byte prefix = (byte)((raw[0] & 7) << 5 | ((raw[1] & 248) >> 3)); // 7 = 00000111
+            var b1 = (byte)(raw[0] & 248);  // 248 = 11111000
+            var prefix = (byte)((raw[0] & 7) << 5 | ((raw[1] & 248) >> 3)); // 7 = 00000111
 
             try
             {
                 if (b1 != PrefixByteSeed)
                     throw new NKeysException("Invalid Seed.");
 
-                PrefixType? tfp = TypeFromPrefix(prefix);
+                var tfp = TypeFromPrefix(prefix);
                 if (!tfp.HasValue)
                 {
                     throw new NKeysException("Invalid Public Prefix Byte.");
@@ -196,13 +196,9 @@ namespace NATS.NKeys
                 type = tfp.Value;
 
                 // Trim off the first two bytes
-                byte[] data = new byte[raw.Length - 2];
+                var data = new byte[raw.Length - 2];
                 Buffer.BlockCopy(raw, 2, data, 0, data.Length);
                 return data;
-            }
-            catch (Exception)
-            {
-                throw;
             }
             finally
             {
@@ -222,11 +218,11 @@ namespace NATS.NKeys
 
         public static NKeyPair FromPublicKey(char[] publicKey)
         {
-            string pkStr = new string(publicKey);
-            byte[] raw = NKeys.Decode(pkStr);
-            byte prefix = (byte)(raw[0] & 0xFF);
+            var pkStr = new string(publicKey);
+            var raw = NKeys.Decode(pkStr);
+            var prefix = (byte)(raw[0] & 0xFF);
 
-            PrefixType? tfp = TypeFromPrefix(prefix);
+            var tfp = TypeFromPrefix(prefix);
             if (!tfp.HasValue)
             {
                 throw new NKeysException("Not a valid public NKey");
@@ -243,7 +239,7 @@ namespace NATS.NKeys
         public static NKeyPair FromSeed(string seed)
         {
             PrefixType type;
-            byte[] userSeed = DecodeSeed(seed, out type);
+            var userSeed = DecodeSeed(seed, out type);
             try
             {
                 var kp = new NKeyPair(userSeed, type);
@@ -263,13 +259,13 @@ namespace NATS.NKeys
             if (src.Length != 32)
                 throw new NKeysException("Invalid seed size");
 
-            MemoryStream stream = new MemoryStream();
+            var stream = new MemoryStream();
 
             if (seed) {
                 // In order to make this human printable for both bytes, we need to do a little
                 // bit manipulation to setup for base32 encoding which takes 5 bits at a time.
-                byte b1 = (byte) (PrefixByteSeed | (prefixbyte >> 5));
-                byte b2 = (byte) ((prefixbyte & 31) << 3); // 31 = 00011111
+                var b1 = (byte) (PrefixByteSeed | (prefixbyte >> 5));
+                var b2 = (byte) ((prefixbyte & 31) << 3); // 31 = 00011111
 
                 stream.WriteByte(b1);
                 stream.WriteByte(b2);
@@ -281,7 +277,7 @@ namespace NATS.NKeys
             stream.Write(src, 0, src.Length);
 
             // Calculate and write crc16 checksum
-            byte[] checksum = BitConverter.GetBytes(Crc16.Checksum(stream.ToArray()));
+            var checksum = BitConverter.GetBytes(Crc16.Checksum(stream.ToArray()));
             stream.Write(checksum, 0, checksum.Length);
 
             return Base32.Encode(stream.ToArray());
@@ -289,7 +285,7 @@ namespace NATS.NKeys
 
         private static string CreateSeed(byte prefixbyte)
         {
-            byte[] rawSeed = new byte[32];
+            var rawSeed = new byte[32];
 
             using (var rng = RandomNumberGenerator.Create())
             {
@@ -333,14 +329,14 @@ namespace NATS.NKeys
         /// <returns>A the public key corresponding to Seed</returns>
         public static string PublicKeyFromSeed(string seed)
         {
-            byte[] s = NKeys.Decode(seed);
+            var s = NKeys.Decode(seed);
             if ((s[0] & (31 << 3)) != PrefixByteSeed)
             {
                 throw new NKeysException("Not a seed");
             }
             // reconstruct prefix byte
-            byte prefixByte = (byte) ((s[0] & 7) << 5 | ((s[1] >> 3) & 31));
-            byte[] pubKey = Ed25519.PublicKeyFromSeed(DecodeSeed(s));
+            var prefixByte = (byte) ((s[0] & 7) << 5 | ((s[1] >> 3) & 31));
+            var pubKey = Ed25519.PublicKeyFromSeed(DecodeSeed(s));
             return Encode(prefixByte, false, pubKey);
         }
     }

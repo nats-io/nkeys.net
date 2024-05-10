@@ -20,9 +20,9 @@ namespace NATS.NKeys.Tests
             _output.WriteLine($"pair.PublicKey: {seed}");
 
             var pair = NKeys.FromSeed(seed);
-            byte[] bytes = pair.Sign(new byte[]{123});
+            var bytes = pair.Sign([123]);
 
-            var verify = pair.Verify(bytes, new byte[]{123, 4});
+            var verify = pair.Verify(bytes, [123, 4]);
             _output.WriteLine($"verify: {verify}");
 
             var encode = NKeys.Encode(NKeys.PrefixByteUser, false, pair.PublicKey);
@@ -35,11 +35,11 @@ namespace NATS.NKeys.Tests
         [Fact]
         public void Encode_decode()
         {
-            byte[] a = new byte[32];
-            byte[] b = NKeys.DecodeSeed(NKeys.Encode(20 << 3, true, a));
+            var a = new byte[32];
+            var b = NKeys.DecodeSeed(NKeys.Encode(20 << 3, true, a));
             Assert.Equal(a, b);
 
-            Random rnd = new Random();
+            var rnd = new Random();
             rnd.NextBytes(a);
             b = NKeys.DecodeSeed(NKeys.Encode(20 << 3, true, a));
             Assert.Equal(a, b);
@@ -48,33 +48,33 @@ namespace NATS.NKeys.Tests
         [Fact]
         public void Create_user_seed()
         {
-            string user = NKeys.CreateUserSeed();
+            var user = NKeys.CreateUserSeed();
             Assert.NotEmpty(user);
             Assert.False(user.EndsWith("=", StringComparison.Ordinal));
             Assert.NotNull(NKeys.FromSeed(user));
-            string pk = NKeys.PublicKeyFromSeed(user);
+            var pk = NKeys.PublicKeyFromSeed(user);
             Assert.Equal('U', pk[0]);
         }
 
         [Fact]
         public void Create_account_seed()
         {
-            string acc = NKeys.CreateAccountSeed();
+            var acc = NKeys.CreateAccountSeed();
             Assert.NotEmpty(acc);
             Assert.False(acc.EndsWith("=", StringComparison.Ordinal));
             Assert.NotNull(NKeys.FromSeed(acc));
-            string pk = NKeys.PublicKeyFromSeed(acc);
+            var pk = NKeys.PublicKeyFromSeed(acc);
             Assert.Equal('A', pk[0]);
         }
 
         [Fact]
         public void Create_operator_seed()
         {
-            string op = NKeys.CreateOperatorSeed();
+            var op = NKeys.CreateOperatorSeed();
             Assert.NotEmpty(op);
             Assert.False(op.EndsWith("=", StringComparison.Ordinal));
             Assert.NotNull(NKeys.FromSeed(op));
-            string pk = NKeys.PublicKeyFromSeed(op);
+            var pk = NKeys.PublicKeyFromSeed(op);
             Assert.Equal('O', pk[0]);
         }
 
@@ -82,7 +82,7 @@ namespace NATS.NKeys.Tests
         public void Public_key_from_seed()
         {
             // using nsc generated seeds for testing
-            string pk = NKeys.PublicKeyFromSeed("SOAELH6NJCEK4HST5644G4HK7TOAFZGRRJHNM4EUKUY7PPNDLIKO5IH4JM");
+            var pk = NKeys.PublicKeyFromSeed("SOAELH6NJCEK4HST5644G4HK7TOAFZGRRJHNM4EUKUY7PPNDLIKO5IH4JM");
             Assert.Equal("ODPWIBQJVIQ42462QAFI2RKJC4RZHCQSIVPRDDHWFCJAP52NRZK6Z2YC", pk);
 
             pk = NKeys.PublicKeyFromSeed("SAANWFZ3JINNPERWT3ALE45U7GYT2ZDW6GJUIVPDKUF6GKAX6AISZJMAS4");

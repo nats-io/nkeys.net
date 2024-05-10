@@ -1,10 +1,12 @@
-﻿using System;
+﻿#pragma warning disable SA1202
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Chaos.NaCl.Tests
+namespace NATS.NKeys.NaCl.Tests
 {
-    static class TestHelpers
+    internal static class TestHelpers
     {
         private static readonly Random _random = new Random();
         private static readonly object _sync = new object();
@@ -37,43 +39,48 @@ namespace Chaos.NaCl.Tests
                 if (array[array.Length - 1] == padByte)
                     padByte++;
             }
+
             var resultBytes = Enumerable.Repeat(padByte, paddingLeft).Concat(array).Concat(Enumerable.Repeat(padByte, paddingRight)).ToArray();
             return new ArraySegment<byte>(resultBytes, paddingLeft, array.Length);
         }
 
         public static byte[] UnPad(this ArraySegment<byte> paddedData)
         {
-            byte padByte = paddedData.Array[0];
+            var padByte = paddedData.Array![0];
             if (padByte < 0xE7 || padByte > 0xE9)
                 throw new ArgumentException("Padding invalid");
-            for (int i = 0; i < paddedData.Offset; i++)
+            for (var i = 0; i < paddedData.Offset; i++)
             {
                 if (paddedData.Array[i] != padByte)
                     throw new ArgumentException("Padding invalid");
             }
-            for (int i = paddedData.Offset + paddedData.Count; i < paddedData.Array.Length; i++)
+
+            for (var i = paddedData.Offset + paddedData.Count; i < paddedData.Array.Length; i++)
             {
                 if (paddedData.Array[i] != padByte)
                     throw new ArgumentException("Padding invalid");
             }
+
             return paddedData.ToArray();
         }
 
         public static IEnumerable<byte[]> WithChangedBit(this byte[] array)
         {
-            for (int i = 0; i < array.Length; i++)
-                for (int bit = 0; bit < 8; bit++)
+            for (var i = 0; i < array.Length; i++)
+            {
+                for (var bit = 0; bit < 8; bit++)
                 {
                     var result = array.ToArray();
                     result[i] ^= (byte)(1 << bit);
                     yield return result;
                 }
+            }
         }
 
         private static byte[] ToArray(this ArraySegment<byte> segment)
         {
             var result = new byte[segment.Count];
-            Array.Copy(segment.Array, segment.Offset, result, 0, segment.Count);
+            Array.Copy(segment.Array!, segment.Offset, result, 0, segment.Count);
             return result;
         }
     }

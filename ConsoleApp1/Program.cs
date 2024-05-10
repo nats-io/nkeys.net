@@ -53,13 +53,29 @@ foreach (var file in files)
                         #pragma warning disable SA1514
                         #pragma warning disable SA1515
                         #pragma warning disable SX1309
+                        #pragma warning disable SA1507
+                        #pragma warning disable SA1401
+                        #pragma warning disable SA1132
+                        #pragma warning disable SA1312
+                        #pragma warning disable SA1520
+                        #pragma warning disable SA1107
+                        #pragma warning disable SA1313
+                        #pragma warning disable SA1501
+                        #pragma warning disable SA1025
 
                         """);
-    foreach (var line in lines)
+    var firstNonEmptyLineFound = false;
+    foreach (var line in lines.Where(l => !l.StartsWith("#pragma")))
     {
-        if (!line.StartsWith("#pragma"))
-            newLines.AppendLine(line);
+        if (string.IsNullOrWhiteSpace(line) && !firstNonEmptyLineFound)
+        {
+            continue;
+        }
+
+        firstNonEmptyLineFound = true;
+
+        newLines.AppendLine(line);
     }
 
-    File.WriteAllText(newLines.ToString(), file);
+    File.WriteAllText(file, newLines.ToString());
 }

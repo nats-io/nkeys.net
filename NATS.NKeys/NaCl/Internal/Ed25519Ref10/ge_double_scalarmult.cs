@@ -1,4 +1,55 @@
-﻿// Copyright 2019 The NATS Authors
+#pragma warning disable CS0465
+#pragma warning disable CS1572
+#pragma warning disable CS1573
+#pragma warning disable CS8603
+#pragma warning disable CS8618
+#pragma warning disable CS8625
+#pragma warning disable SA1001
+#pragma warning disable SA1002
+#pragma warning disable SA1003
+#pragma warning disable SA1005
+#pragma warning disable SA1008
+#pragma warning disable SA1009
+#pragma warning disable SA1011
+#pragma warning disable SA1012
+#pragma warning disable SA1021
+#pragma warning disable SA1027
+#pragma warning disable SA1106
+#pragma warning disable SA1111
+#pragma warning disable SA1117
+#pragma warning disable SA1119
+#pragma warning disable SA1122
+#pragma warning disable SA1137
+#pragma warning disable SA1201
+#pragma warning disable SA1202
+#pragma warning disable SA1204
+#pragma warning disable SA1206
+#pragma warning disable SA1300
+#pragma warning disable SA1303
+#pragma warning disable SA1307
+#pragma warning disable SA1400
+#pragma warning disable SA1407
+#pragma warning disable SA1413
+#pragma warning disable SA1500
+#pragma warning disable SA1505
+#pragma warning disable SA1508
+#pragma warning disable SA1512
+#pragma warning disable SA1513
+#pragma warning disable SA1514
+#pragma warning disable SA1515
+#pragma warning disable SX1309
+#pragma warning disable SA1507
+#pragma warning disable SA1401
+#pragma warning disable SA1132
+#pragma warning disable SA1312
+#pragma warning disable SA1520
+#pragma warning disable SA1107
+#pragma warning disable SA1313
+#pragma warning disable SA1501
+#pragma warning disable SA1025
+#pragma warning disable SA1025
+
+// Copyright 2019 The NATS Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -11,36 +62,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#pragma warning disable CS1572
-#pragma warning disable CS1573
-#pragma warning disable CS8603
-#pragma warning disable CS8618
-#pragma warning disable CS8625
-#pragma warning disable SA1001
-#pragma warning disable SA1002
-#pragma warning disable SA1003
-#pragma warning disable SA1008
-#pragma warning disable SA1009
-#pragma warning disable SA1011
-#pragma warning disable SA1012
-#pragma warning disable SA1021
-#pragma warning disable SA1027
-#pragma warning disable SA1106
-#pragma warning disable SA1111
-#pragma warning disable SA1119
-#pragma warning disable SA1137
-#pragma warning disable SA1201
-#pragma warning disable SA1202
-#pragma warning disable SA1303
-#pragma warning disable SA1307
-#pragma warning disable SA1407
-#pragma warning disable SA1413
-#pragma warning disable SA1500
-#pragma warning disable SA1508
-#pragma warning disable SA1512
-#pragma warning disable SA1513
-#pragma warning disable SA1515
-#pragma warning disable SX1309
 
 // Borrowed from https://github.com/CryptoManiac/Ed25519
 
@@ -93,8 +114,8 @@ namespace NATS.NKeys.NaCl.Internal.Ed25519Ref10
 		B is the Ed25519 base point (x,4/5) with x positive.
 		*/
 
-		public static void ge_double_scalarmult_vartime(out GroupElementP2 r, byte[] a, ref GroupElementP3 A, byte[] b)
-		{
+        public static void ge_double_scalarmult_vartime(out GroupElementP2 r, byte[] a, ref GroupElementP3 A, byte[] b)
+        {
 			GroupElementPreComp[] Bi = NATS.NKeys.NaCl.Internal.Ed25519Ref10.LookupTables.Base2;
             // todo: Perhaps remove these allocations?
 			sbyte[] aslide = new sbyte[256];

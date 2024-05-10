@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Numerics;
 using NATS.NKeys.NaCl;
+using NATS.NKeys.NaCl.Tests;
 
 namespace Chaos.NaCl.Tests
 {
@@ -10,10 +11,11 @@ namespace Chaos.NaCl.Tests
         static Ed25519Tests()
         {
             Ed25519TestVectors.LoadTestCases();
-            //Warmup
+
+            // Warmup
             var pk = Ed25519.PublicKeyFromSeed(new byte[32]);
             var sk = Ed25519.ExpandedPrivateKeyFromSeed(new byte[32]);
-            var sig = Ed25519.Sign(Ed25519TestVectors.TestCases.Last().getMessage(), sk);
+            var sig = Ed25519.Sign(Ed25519TestVectors.TestCases.Last().GetMessage(), sk);
             Ed25519.Verify(sig, new byte[10], pk);
         }
 
@@ -24,12 +26,11 @@ namespace Chaos.NaCl.Tests
             {
                 byte[] publicKey;
                 byte[] privateKey;
-                Ed25519.KeyPairFromSeed(out publicKey, out privateKey, testCase.getSeed());
-                TestHelpers.AssertEqualBytes(testCase.getPublicKey(), publicKey);
-                TestHelpers.AssertEqualBytes(testCase.getPrivateKey(), privateKey);
+                Ed25519.KeyPairFromSeed(out publicKey, out privateKey, testCase.GetSeed());
+                TestHelpers.AssertEqualBytes(testCase.GetPublicKey(), publicKey);
+                TestHelpers.AssertEqualBytes(testCase.GetPrivateKey(), privateKey);
             }
         }
-
 
         [Fact]
         public void KeyPairFromSeedSegments()
@@ -38,9 +39,9 @@ namespace Chaos.NaCl.Tests
             {
                 var publicKey = new byte[Ed25519.PublicKeySize].Pad();
                 var privateKey = new byte[Ed25519.ExpandedPrivateKeySize].Pad();
-                Ed25519.KeyPairFromSeed(publicKey, privateKey, testCase.getSeed().Pad());
-                TestHelpers.AssertEqualBytes(testCase.getPublicKey(), publicKey.UnPad());
-                TestHelpers.AssertEqualBytes(testCase.getPrivateKey(), privateKey.UnPad());
+                Ed25519.KeyPairFromSeed(publicKey, privateKey, testCase.GetSeed().Pad());
+                TestHelpers.AssertEqualBytes(testCase.GetPublicKey(), publicKey.UnPad());
+                TestHelpers.AssertEqualBytes(testCase.GetPrivateKey(), privateKey.UnPad());
             }
         }
 
@@ -49,9 +50,9 @@ namespace Chaos.NaCl.Tests
         {
             foreach (var testCase in Ed25519TestVectors.TestCases)
             {
-                var sig = Ed25519.Sign(testCase.getMessage(), testCase.getPrivateKey());
+                var sig = Ed25519.Sign(testCase.GetMessage(), testCase.GetPrivateKey());
                 Assert.Equal(64, sig.Length);
-                TestHelpers.AssertEqualBytes(testCase.getSignature(), sig);
+                TestHelpers.AssertEqualBytes(testCase.GetSignature(), sig);
             }
         }
 
@@ -60,7 +61,7 @@ namespace Chaos.NaCl.Tests
         {
             foreach (var testCase in Ed25519TestVectors.TestCases)
             {
-                bool success = Ed25519.Verify(testCase.getSignature(), testCase.getMessage(), testCase.getPublicKey());
+                var success = Ed25519.Verify(testCase.GetSignature(), testCase.GetMessage(), testCase.GetPublicKey());
                 Assert.True(success);
             }
         }
@@ -78,25 +79,11 @@ namespace Chaos.NaCl.Tests
             {
                 Assert.False(Ed25519.Verify(signature, modifiedMessage, pk));
             }
+
             foreach (var modifiedSignature in signature.WithChangedBit())
             {
                 Assert.False(Ed25519.Verify(modifiedSignature, message, pk));
             }
-        }
-
-        private byte[] AddL(IEnumerable<byte> input)
-        {
-            var signedInput = input.Concat(new byte[] { 0 }).ToArray();
-            var i = new BigInteger(signedInput);
-            var l = BigInteger.Pow(2, 252) + BigInteger.Parse("27742317777372353535851937790883648493");
-            i += l;
-            var result = i.ToByteArray().Concat(Enumerable.Repeat((byte)0, 32)).Take(32).ToArray();
-            return result;
-        }
-
-        private byte[] AddLToSignature(byte[] signature)
-        {
-            return signature.Take(32).Concat(AddL(signature.Skip(32))).ToArray();
         }
 
         // Ed25519 is malleable in the `S` part of the signature
@@ -127,7 +114,7 @@ namespace Chaos.NaCl.Tests
         {
             foreach (var testCase in Ed25519TestVectors.TestCases)
             {
-                bool success = Ed25519.Verify(testCase.getSignature().Pad(), testCase.getMessage().Pad(), testCase.getPublicKey().Pad());
+                var success = Ed25519.Verify(testCase.GetSignature().Pad(), testCase.GetMessage().Pad(), testCase.GetPublicKey().Pad());
                 Assert.True(success);
             }
         }
@@ -145,10 +132,26 @@ namespace Chaos.NaCl.Tests
             {
                 Assert.False(Ed25519.Verify(signature.Pad(), modifiedMessage.Pad(), pk.Pad()));
             }
+
             foreach (var modifiedSignature in signature.WithChangedBit())
             {
                 Assert.False(Ed25519.Verify(modifiedSignature.Pad(), message.Pad(), pk.Pad()));
             }
+        }
+
+        private byte[] AddL(IEnumerable<byte> input)
+        {
+            var signedInput = input.Concat(new byte[] { 0 }).ToArray();
+            var i = new BigInteger(signedInput);
+            var l = BigInteger.Pow(2, 252) + BigInteger.Parse("27742317777372353535851937790883648493");
+            i += l;
+            var result = i.ToByteArray().Concat(Enumerable.Repeat((byte)0, 32)).Take(32).ToArray();
+            return result;
+        }
+
+        private byte[] AddLToSignature(byte[] signature)
+        {
+            return signature.Take(32).Concat(AddL(signature.Skip(32))).ToArray();
         }
     }
 }
