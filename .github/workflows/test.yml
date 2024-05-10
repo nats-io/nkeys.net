@@ -31,3 +31,44 @@ jobs:
 
       - name: Test Core
         run: dotnet test -c Debug --no-build --logger:"console;verbosity=normal"
+
+      - name: Setup Runtime Identifier
+        id: rid
+        shell: bash
+        run: |
+            if [ "${{ matrix.os }}" = "windows-latest" ]; then
+              echo "::set-output name=runtime::win-x64"
+            elif [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
+              echo "::set-output name=runtime::linux-x64"
+            elif [ "${{ matrix.os }}" = "macos-latest" ]; then
+              echo "::set-output name=runtime::osx-x64"
+            fi
+
+      - name: Check Native AOT
+        shell: bash
+        run: |
+            cd NATS.NKeys.CheckNativeAot
+            rm -rf bin obj
+            dotnet publish -r ${{ steps.rid.outputs.runtime }} -c Release -o dist | tee output.txt
+
+            # check for warnings
+            grep -i warning output.txt && exit 1
+
+            cd dist
+            ls -lh
+
+            export exe_file=$(ls NATS.NKeys.CheckNativeAot*)
+            file $exe_file
+
+            if [ "${{ matrix.os }}" = "windows-latest" ]; then
+              file NATS.NKeys.CheckNativeAot.exe | grep PE32 || exit 1
+            elif [ "${{ matrix.os }}" = "macos-latest" ]; then
+              file NATS.NKeys.CheckNativeAot | grep Mach-O || exit 1
+            else
+              file NATS.NKeys.CheckNativeAot | grep ELF || exit 1
+            fi
+
+            # can't be less than a meg
+            ls --size $exe_file | perl -lne'/(\d+)/; exit(1) if $1 < 1024' || exit 1
+
+            ./$exe_file

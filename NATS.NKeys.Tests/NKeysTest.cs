@@ -4,32 +4,25 @@ using Xunit.Abstractions;
 
 namespace NATS.NKeys.Tests
 {
-    public class NKeysTest
+    public class NKeysTest(ITestOutputHelper output)
     {
-        private readonly ITestOutputHelper _output;
-
-        public NKeysTest(ITestOutputHelper output)
-        {
-            _output = output;
-        }
-
         [Fact]
         public void Create_seed()
         {
             var seed = NKeys.CreateUserSeed();
-            _output.WriteLine($"pair.PublicKey: {seed}");
+            output.WriteLine($"pair.PublicKey: {seed}");
 
             var pair = NKeys.FromSeed(seed);
             var bytes = pair.Sign([123]);
 
             var verify = pair.Verify(bytes, [123, 4]);
-            _output.WriteLine($"verify: {verify}");
+            output.WriteLine($"verify: {verify}");
 
             var encode = NKeys.Encode(NKeys.PrefixByteUser, false, pair.PublicKey);
-            _output.WriteLine($"encode: {encode}");
+            output.WriteLine($"encode: {encode}");
 
             var publicKey = NKeys.PublicKeyFromSeed(seed);
-            _output.WriteLine($"PublicKey: {publicKey}");
+            output.WriteLine($"PublicKey: {publicKey}");
         }
 
         [Fact]
