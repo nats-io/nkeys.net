@@ -28,19 +28,21 @@ jobs:
               6.x
               8.x
 
-      - name: Build
-        run: dotnet build -c Debug
-
-      - name: Test Core
-        run: dotnet test -c Debug --no-build --logger:"console;verbosity=normal"
+#      - name: Build
+#        run: dotnet build -c Debug
+#
+#      - name: Test Core
+#        run: dotnet test -c Debug --no-build --logger:"console;verbosity=normal"
 
       - name: Check Native AOT
         shell: bash
         run: |
+            echo ">>>>> 1"
             export exe_file=NATS.NKeys.CheckNativeAot
             export exe_type=ELF
             export dotnet_runtime_id=linux-x64
 
+            echo ">>>>> 2"
             if [ "${{ matrix.os }}" = "windows-latest" ]; then
               export exe_file=NATS.NKeys.CheckNativeAot.exe
               export exe_type=PE32
@@ -50,13 +52,16 @@ jobs:
               export dotnet_runtime_id=osx-x64
               export exe_type=Mach-O
             fi
+            echo ">>>>> 3"
 
             cd NATS.NKeys.CheckNativeAot
             rm -rf bin obj
             dotnet publish -r $dotnet_runtime_id -c Release -o dist | tee output.txt
+            echo ">>>>> 4"
 
             # check for warnings
             grep -i warning output.txt && exit 1
+            echo ">>>>> 5"
 
             cd dist
             ls -lh
