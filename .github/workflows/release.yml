@@ -45,10 +45,9 @@ jobs:
         name: Push
         run: |
           cd dist
-          ls -l
+          ls -lh
           # this should upload snupkgs in the same folder
-          # TODO: remove echo
-          echo dotnet nuget push *.nupkg -s https://api.nuget.org/v3/index.json -k "${{ secrets.NUGET_API_KEY }}" --skip-duplicate
+          # dotnet nuget push *.nupkg -s https://api.nuget.org/v3/index.json -k "${{ secrets.NUGET_API_KEY }}" --skip-duplicate
 
       - if: ${{ fromJSON(steps.tag.outputs.create) }}
         name: Tag
