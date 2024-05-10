@@ -59,18 +59,22 @@ jobs:
             cd dist
             ls -lh
 
-            export exe_file=$(ls NATS.NKeys.CheckNativeAot*)
-            file $exe_file
+            export exe_file=NATS.NKeys.CheckNativeAot
+            export exe_type=ELF
 
             if [ "${{ matrix.os }}" = "windows-latest" ]; then
+              export exe_file=NATS.NKeys.CheckNativeAot.exe
+              export exe_type=PE32
               file NATS.NKeys.CheckNativeAot.exe | grep PE32 || exit 1
             elif [ "${{ matrix.os }}" = "macos-latest" ]; then
-              file NATS.NKeys.CheckNativeAot | grep Mach-O || exit 1
-            else
-              file NATS.NKeys.CheckNativeAot | grep ELF || exit 1
+              export exe_type=Mach-O
             fi
 
+            file $exe_file
+            file $exe_file | grep $exe_type || exit 1
+
             # can't be less than a meg
+            ls --size $exe_file
             ls --size $exe_file | perl -lne'/(\d+)/; exit(1) if $1 < 1024' || exit 1
 
             ./$exe_file
