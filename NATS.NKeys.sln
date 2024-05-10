@@ -22,6 +22,21 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NATS.NKeys.NaCl.Tests", "NA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{908253F3-1064-48D3-935F-9E435697C921}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{6A64D5FF-ED5C-427E-92E9-486354041BCD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ISSUE_TEMPLATE", "ISSUE_TEMPLATE", "{27BEA938-4123-4AE8-8640-EFF320918101}"
+	ProjectSection(SolutionItems) = preProject
+		.github\ISSUE_TEMPLATE\config.yml = .github\ISSUE_TEMPLATE\config.yml
+		.github\ISSUE_TEMPLATE\defect.yml = .github\ISSUE_TEMPLATE\defect.yml
+		.github\ISSUE_TEMPLATE\proposal.yml = .github\ISSUE_TEMPLATE\proposal.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{B163496C-156D-4ACD-B6A0-040354F96305}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\format.yml = .github\workflows\format.yml
+		.github\workflows\test.yml = .github\workflows\test.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,5 +62,9 @@ Global
 		{908253F3-1064-48D3-935F-9E435697C921}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{908253F3-1064-48D3-935F-9E435697C921}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{908253F3-1064-48D3-935F-9E435697C921}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{27BEA938-4123-4AE8-8640-EFF320918101} = {6A64D5FF-ED5C-427E-92E9-486354041BCD}
+		{B163496C-156D-4ACD-B6A0-040354F96305} = {6A64D5FF-ED5C-427E-92E9-486354041BCD}
 	EndGlobalSection
 EndGlobal
