@@ -74,7 +74,7 @@ jobs:
             file $exe_file | grep $exe_type || exit 1
 
             # can't be less than a meg and not more than 10 megs
-            # (fairly arbitrary, but we want to make sure it's size is reasonable)
+            # (fairly arbitrary, but we want to make sure executable size is reasonable)
 
             export filesize=0
 
