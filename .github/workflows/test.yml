@@ -39,21 +39,21 @@ jobs:
         run: |
             export exe_file=NATS.NKeys.CheckNativeAot
             export exe_type=ELF
-            export dotnet_runtime=linux-x64
+            export dotnet_runtime_id=linux-x64
 
             if [ "${{ matrix.os }}" = "windows-latest" ]; then
               export exe_file=NATS.NKeys.CheckNativeAot.exe
               export exe_type=PE32
-              export dotnet_runtime=win-x64
+              export dotnet_runtime_id=win-x64
               file NATS.NKeys.CheckNativeAot.exe | grep PE32 || exit 1
             elif [ "${{ matrix.os }}" = "macos-latest" ]; then
-              export dotnet_runtime=osx-x64
+              export dotnet_runtime_id=osx-x64
               export exe_type=Mach-O
             fi
 
             cd NATS.NKeys.CheckNativeAot
             rm -rf bin obj
-            dotnet publish -r $dotnet_runtime -c Release -o dist | tee output.txt
+            dotnet publish -r $dotnet_runtime_id -c Release -o dist | tee output.txt
 
             # check for warnings
             grep -i warning output.txt && exit 1
