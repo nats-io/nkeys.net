@@ -11,7 +11,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".", ".", "{67B70F86-B055-4C
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
 		LICENSE = LICENSE
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		Directory.Build.props = Directory.Build.props
+		Icon.png = Icon.png
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NATS.NKeys.NaCl.Tests", "NATS.NKeys.NaCl.Tests\NATS.NKeys.NaCl.Tests.csproj", "{3A58BAD0-7702-4C16-BF35-C808A4644348}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{908253F3-1064-48D3-935F-9E435697C921}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,5 +39,13 @@ Global
 		{2BF2E0B0-23E0-442C-BE2B-2CE820DF6A0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2BF2E0B0-23E0-442C-BE2B-2CE820DF6A0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2BF2E0B0-23E0-442C-BE2B-2CE820DF6A0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A58BAD0-7702-4C16-BF35-C808A4644348}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A58BAD0-7702-4C16-BF35-C808A4644348}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A58BAD0-7702-4C16-BF35-C808A4644348}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A58BAD0-7702-4C16-BF35-C808A4644348}.Release|Any CPU.Build.0 = Release|Any CPU
+		{908253F3-1064-48D3-935F-9E435697C921}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{908253F3-1064-48D3-935F-9E435697C921}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{908253F3-1064-48D3-935F-9E435697C921}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{908253F3-1064-48D3-935F-9E435697C921}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

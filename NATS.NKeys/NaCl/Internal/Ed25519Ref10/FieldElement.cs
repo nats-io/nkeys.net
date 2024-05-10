@@ -15,6 +15,9 @@
 
 using System;
 
+#pragma warning disable SA1132
+#pragma warning disable SA1307
+
 namespace NATS.NKeys.NaCl.Internal.Ed25519Ref10
 {
     internal struct FieldElement

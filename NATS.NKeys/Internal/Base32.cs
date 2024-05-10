@@ -1,5 +1,10 @@
 ﻿using System;
 
+#pragma warning disable CS8603 // Possible null reference return.
+#pragma warning disable SA1513
+#pragma warning disable SA1005
+#pragma warning disable SA1201
+
 namespace NATS.NKeys.Internal
 {
     // Borrowed from:  https://stackoverflow.com/a/7135008
@@ -117,7 +122,7 @@ namespace NATS.NKeys.Internal
                 return (char)(b + 24);
             throw new ArgumentException("Byte is not a value Base32 value.", "b");
         }
-        
+
         private const int InByteSize = 8;
 
         /// <summary>
@@ -125,6 +130,7 @@ namespace NATS.NKeys.Internal
         /// </summary>
         private const int OutByteSize = 5;
         private const string Base32Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+
         public static byte[] FromBase32String(string base32String)
         {
             // Check if string is null
@@ -132,6 +138,7 @@ namespace NATS.NKeys.Internal
             {
                 return null;
             }
+
             // Check if empty
             else if (base32String == string.Empty)
             {
@@ -208,6 +215,6 @@ namespace NATS.NKeys.Internal
             }
 
             return outputBytes;
-        }    
+        }
     }
 }

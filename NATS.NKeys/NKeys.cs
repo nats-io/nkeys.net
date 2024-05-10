@@ -18,10 +18,40 @@ using System.Text;
 using NATS.NKeys.Internal;
 using NATS.NKeys.NaCl;
 
+#pragma warning disable CS1572
+#pragma warning disable CS1573
+#pragma warning disable CS8603
+#pragma warning disable CS8618
+#pragma warning disable CS8625
+#pragma warning disable SA1001
+#pragma warning disable SA1002
+#pragma warning disable SA1003
+#pragma warning disable SA1008
+#pragma warning disable SA1009
+#pragma warning disable SA1011
+#pragma warning disable SA1012
+#pragma warning disable SA1021
+#pragma warning disable SA1027
+#pragma warning disable SA1106
+#pragma warning disable SA1111
+#pragma warning disable SA1119
+#pragma warning disable SA1137
+#pragma warning disable SA1201
+#pragma warning disable SA1202
+#pragma warning disable SA1303
+#pragma warning disable SA1307
+#pragma warning disable SA1407
+#pragma warning disable SA1413
+#pragma warning disable SA1500
+#pragma warning disable SA1512
+#pragma warning disable SA1513
+#pragma warning disable SA1515
+#pragma warning disable SX1309
+
 namespace NATS.NKeys
 {
     /// <summary>
-    /// Nkeys is a class provided to manipulate Nkeys and generate NkeyPairs. 
+    /// Nkeys is a class provided to manipulate Nkeys and generate NkeyPairs.
     /// </summary>
     public static class NKeys
     {
@@ -48,7 +78,7 @@ namespace NATS.NKeys
 
         // PrefixByteUnknown is for unknown prefixes.
         public const byte PrefixByteUknown = 23 << 3; // Base32-encodes to 'X...'
-        
+
         public enum PrefixType
         {
             User,
@@ -77,7 +107,7 @@ namespace NATS.NKeys
 
             if (crc != Crc16.Checksum(data))
                 throw new NKeysException("Invalid CRC");
- 
+
             return data;
         }
 
@@ -189,7 +219,7 @@ namespace NATS.NKeys
         {
             return DecodeSeed(NKeys.Decode(src), out type);
         }
-        
+
         public static NKeyPair FromPublicKey(char[] publicKey)
         {
             string pkStr = new string(publicKey);

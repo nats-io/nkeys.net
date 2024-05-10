@@ -11,12 +11,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+#pragma warning disable CS1573 // Parameter has no matching param tag in the XML comment (but other parameters do)
+#pragma warning disable CS1572 // XML comment has a param tag, but there is no parameter by that name
+#pragma warning disable CS8603 // Possible null reference return.
+#pragma warning disable SA1303
+#pragma warning disable SA1512
+#pragma warning disable SA1515
+#pragma warning disable SA1119
+#pragma warning disable SA1202
+#pragma warning disable SA1201
+#pragma warning disable SX1309
+#pragma warning disable SA1307
+#pragma warning disable SA1401
+
 // Borrowed from https://github.com/CryptoManiac/Ed25519
 
 namespace NATS.NKeys.NaCl.Internal.Ed25519Ref10
 {
-	internal static partial class LookupTables
-	{
-		internal static FieldElement d2 = new FieldElement(-21827239, -5839606, -30745221, 13898782, 229458, 15978800, -12551817, -6495438, 29715968, 9444199);
-	}
+    internal static partial class LookupTables
+    {
+        internal static FieldElement d2 = new FieldElement(-21827239, -5839606, -30745221, 13898782, 229458, 15978800, -12551817, -6495438, 29715968, 9444199);
+    }
 }

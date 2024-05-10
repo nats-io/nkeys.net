@@ -11,6 +11,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#pragma warning disable SA1001
+#pragma warning disable SA1009
+#pragma warning disable SA1512
+#pragma warning disable SA1005
+#pragma warning disable SA1401
+#pragma warning disable SA1011
+#pragma warning disable SA1500
+#pragma warning disable SA1012
+#pragma warning disable SA1012
+#pragma warning disable SA1021
+#pragma warning disable SA1111
+#pragma warning disable SA1008
+#pragma warning disable SA1413
+
 // Borrowed from https://github.com/CryptoManiac/Ed25519
 
 namespace NATS.NKeys.NaCl.Internal.Ed25519Ref10

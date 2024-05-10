@@ -1,0 +1,39 @@
+<Project>
+    <PropertyGroup>
+        <LangVersion>latest</LangVersion>
+        <Nullable>enable</Nullable>
+        <NoWarn>$(NoWarn);CS1591;SA0001</NoWarn>
+        <SignAssembly>true</SignAssembly>
+        <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)opensource.snk</AssemblyOriginatorKeyFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Stylecop.Analyzers" Version="1.2.0-beta.556">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <PropertyGroup>
+        <!-- NuGet Packaging -->
+        <Version>$([System.IO.File]::ReadAllText("$(MSBuildThisFileDirectory)version.txt"))</Version>
+        <PackageVersion>$(Version)</PackageVersion>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <Company>CNCF</Company>
+        <Authors>The NATS Authors</Authors>
+        <Copyright>Copyright © The NATS Authors 2016-$([System.DateTime]::Now.ToString(yyyy))</Copyright>
+        <PackageProjectUrl>https://github.com/nats-io/nkeys.net</PackageProjectUrl>
+        <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+        <PackageIcon>Icon.png</PackageIcon>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="$(MSBuildThisFileDirectory)LICENSE" Pack="true" PackagePath=""/>
+        <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath=""/>
+        <None Include="$(MSBuildThisFileDirectory)Icon.png" Pack="true" PackagePath=""/>
+    </ItemGroup>
+
+</Project>

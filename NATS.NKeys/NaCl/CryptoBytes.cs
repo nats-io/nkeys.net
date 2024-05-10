@@ -11,12 +11,53 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#pragma warning disable CS0465
+#pragma warning disable CS1572
+#pragma warning disable CS1573
+#pragma warning disable CS8603
+#pragma warning disable CS8618
+#pragma warning disable CS8625
+#pragma warning disable SA1001
+#pragma warning disable SA1002
+#pragma warning disable SA1003
+#pragma warning disable SA1005
+#pragma warning disable SA1008
+#pragma warning disable SA1009
+#pragma warning disable SA1011
+#pragma warning disable SA1012
+#pragma warning disable SA1021
+#pragma warning disable SA1027
+#pragma warning disable SA1106
+#pragma warning disable SA1111
+#pragma warning disable SA1117
+#pragma warning disable SA1119
+#pragma warning disable SA1122
+#pragma warning disable SA1137
+#pragma warning disable SA1201
+#pragma warning disable SA1202
+#pragma warning disable SA1204
+#pragma warning disable SA1206
+#pragma warning disable SA1300
+#pragma warning disable SA1303
+#pragma warning disable SA1307
+#pragma warning disable SA1400
+#pragma warning disable SA1407
+#pragma warning disable SA1413
+#pragma warning disable SA1500
+#pragma warning disable SA1505
+#pragma warning disable SA1508
+#pragma warning disable SA1512
+#pragma warning disable SA1513
+#pragma warning disable SA1514
+#pragma warning disable SA1515
+#pragma warning disable SX1309
+
 // Borrowed from https://github.com/CryptoManiac/Ed25519
 
-
 using System;
+using System.Linq;
+using System.Numerics;
 using System.Runtime.CompilerServices;
-//using Numerics;
 
 namespace NATS.NKeys.NaCl
 {
@@ -38,7 +79,9 @@ namespace NATS.NKeys.NaCl
         /// <returns>True if arrays are equal</returns>
         public static bool ConstantTimeEquals(byte[] x, byte[] y)
         {
-            // Contract.Requires<ArgumentNullException>(x != null && y != null);
+            if (x == null) throw new ArgumentNullException(nameof(x));
+            if (y == null) throw new ArgumentNullException(nameof(y));
+
             if (x.Length != y.Length)
                 return false;
             return InternalConstantTimeEquals(x, 0, y, 0, x.Length) != 0;
@@ -57,7 +100,9 @@ namespace NATS.NKeys.NaCl
         /// <returns>True if contents of x and y are equal</returns>
         public static bool ConstantTimeEquals(ArraySegment<byte> x, ArraySegment<byte> y)
         {
-            // Contract.Requires<ArgumentNullException>(x.Array != null && y.Array != null);
+            if (x == null) throw new ArgumentNullException(nameof(x));
+            if (y == null) throw new ArgumentNullException(nameof(y));
+
             if (x.Array == null || y.Array == null) throw new ArgumentNullException();
             if (x.Count != y.Count)
                 return false;
@@ -83,7 +128,7 @@ namespace NATS.NKeys.NaCl
             // Contract.Requires<ArgumentNullException>(x != null && y != null);
             if (x == null || y == null) throw new ArgumentNullException();
             // Contract.Requires<ArgumentOutOfRangeException>(xOffset >= 0 && yOffset >= 0 && length >= 0);
-            if (xOffset < 0 || yOffset < 0 || length < 0) throw new ArgumentException();
+            if (xOffset < 0 || yOffset < 0 || length < 0) throw new ArgumentOutOfRangeException();
             // Contract.Requires<ArgumentException>(xOffset + length <= x.Length);
             if (xOffset + length > x.Length) throw new ArgumentException();
             // Contract.Requires<ArgumentException>(yOffset + length <= y.Length);
@@ -244,6 +289,72 @@ namespace NATS.NKeys.NaCl
             if (base64String == null)
                 return null;
             return Convert.FromBase64String(base64String);
+        }
+
+        private const string strDigits = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+
+        /// <summary>
+        /// Encode a byte sequence as a base58-encoded string
+        /// </summary>
+        /// <param name="input">Byte sequence</param>
+        /// <returns>Encoding result</returns>
+        public static string Base58Encode(byte[] input)
+        {
+            if (input == null) throw new ArgumentNullException(nameof(input));
+
+            // Decode byte[] to BigInteger
+            BigInteger intData = 0;
+            for (int i = 0; i < input.Length; i++)
+            {
+                intData = intData * 256 + input[i];
+            }
+
+            // Encode BigInteger to Base58 string
+            string result = "";
+            while (intData > 0)
+            {
+                int remainder = (int)(intData % 58);
+                intData /= 58;
+                result = strDigits[remainder] + result;
+            }
+
+            // Append `1` for each leading 0 byte
+            for (int i = 0; i < input.Length && input[i] == 0; i++)
+            {
+                result = '1' + result;
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// // Decode a base58-encoded string into byte array
+        /// </summary>
+        /// <param name="strBase58">Base58 data string</param>
+        /// <returns>Byte array</returns>
+        public static byte[] Base58Decode(string input)
+        {
+            if (input == null) throw new ArgumentNullException(nameof(input));
+
+            // Decode Base58 string to BigInteger
+            BigInteger intData = 0;
+            for (int i = 0; i < input.Length; i++)
+            {
+                int digit = strDigits.IndexOf(input[i]); //Slow
+                if (digit < 0)
+                    throw new FormatException(string.Format("Invalid Base58 character `{0}` at position {1}", input[i], i));
+                intData = intData * 58 + digit;
+            }
+
+            // Encode BigInteger to byte[]
+            // Leading zero bytes get encoded as leading `1` characters
+            int leadingZeroCount = input.TakeWhile(c => c == '1').Count();
+            var leadingZeros = Enumerable.Repeat((byte)0, leadingZeroCount);
+            var bytesWithoutLeadingZeros =
+                intData.ToByteArray()
+                .Reverse()// to big endian
+                .SkipWhile(b => b == 0);//strip sign byte
+            var result = leadingZeros.Concat(bytesWithoutLeadingZeros).ToArray();
+            return result;
         }
     }
 }

@@ -1,4 +1,42 @@
-﻿namespace NATS.NKeys.Internal
+﻿#pragma warning disable CS0465
+#pragma warning disable CS1572
+#pragma warning disable CS1573
+#pragma warning disable CS8603
+#pragma warning disable CS8618
+#pragma warning disable CS8625
+#pragma warning disable SA1001
+#pragma warning disable SA1002
+#pragma warning disable SA1003
+#pragma warning disable SA1005
+#pragma warning disable SA1008
+#pragma warning disable SA1009
+#pragma warning disable SA1011
+#pragma warning disable SA1012
+#pragma warning disable SA1021
+#pragma warning disable SA1027
+#pragma warning disable SA1106
+#pragma warning disable SA1111
+#pragma warning disable SA1119
+#pragma warning disable SA1137
+#pragma warning disable SA1201
+#pragma warning disable SA1202
+#pragma warning disable SA1204
+#pragma warning disable SA1206
+#pragma warning disable SA1300
+#pragma warning disable SA1303
+#pragma warning disable SA1307
+#pragma warning disable SA1400
+#pragma warning disable SA1407
+#pragma warning disable SA1413
+#pragma warning disable SA1500
+#pragma warning disable SA1505
+#pragma warning disable SA1508
+#pragma warning disable SA1512
+#pragma warning disable SA1513
+#pragma warning disable SA1515
+#pragma warning disable SX1309
+
+namespace NATS.NKeys.Internal
 {
     internal static class Crc16
     {
@@ -43,6 +81,7 @@
             {
                 crc = ((crc << 8) & 0xffff) ^ crc16tab[((crc >> 8) ^ (ushort)b & 0x00FF)];
             }
+
             return (ushort)crc;
         }
     }

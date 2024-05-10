@@ -11,32 +11,62 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#pragma warning disable CS1572
+#pragma warning disable CS1573
+#pragma warning disable CS8603
+#pragma warning disable CS8618
+#pragma warning disable CS8625
+#pragma warning disable SA1001
+#pragma warning disable SA1002
+#pragma warning disable SA1003
+#pragma warning disable SA1008
+#pragma warning disable SA1009
+#pragma warning disable SA1011
+#pragma warning disable SA1012
+#pragma warning disable SA1021
+#pragma warning disable SA1027
+#pragma warning disable SA1106
+#pragma warning disable SA1111
+#pragma warning disable SA1119
+#pragma warning disable SA1137
+#pragma warning disable SA1201
+#pragma warning disable SA1202
+#pragma warning disable SA1303
+#pragma warning disable SA1307
+#pragma warning disable SA1407
+#pragma warning disable SA1413
+#pragma warning disable SA1500
+#pragma warning disable SA1512
+#pragma warning disable SA1513
+#pragma warning disable SA1515
+#pragma warning disable SX1309
+
 // Borrowed from https://github.com/CryptoManiac/Ed25519
 
 namespace NATS.NKeys.NaCl.Internal.Ed25519Ref10
 {
-	/*
-	ge means group element.
+    /*
+    ge means group element.
 
-	Here the group is the set of pairs (x,y) of field elements (see fe.h)
-	satisfying -x^2 + y^2 = 1 + d x^2y^2
-	where d = -121665/121666.
+    Here the group is the set of pairs (x,y) of field elements (see fe.h)
+    satisfying -x^2 + y^2 = 1 + d x^2y^2
+    where d = -121665/121666.
 
-	Representations:
-	  ge_p2 (projective): (X:Y:Z) satisfying x=X/Z, y=Y/Z
-	  ge_p3 (extended): (X:Y:Z:T) satisfying x=X/Z, y=Y/Z, XY=ZT
-	  ge_p1p1 (completed): ((X:Z),(Y:T)) satisfying x=X/Z, y=Y/T
-	  ge_precomp (Duif): (y+x,y-x,2dxy)
-	*/
+    Representations:
+      ge_p2 (projective): (X:Y:Z) satisfying x=X/Z, y=Y/Z
+      ge_p3 (extended): (X:Y:Z:T) satisfying x=X/Z, y=Y/Z, XY=ZT
+      ge_p1p1 (completed): ((X:Z),(Y:T)) satisfying x=X/Z, y=Y/T
+      ge_precomp (Duif): (y+x,y-x,2dxy)
+    */
 
-	internal struct GroupElementP2
+    internal struct GroupElementP2
 	{
 		public FieldElement X;
 		public FieldElement Y;
 		public FieldElement Z;
-	} ;
+    } ;
 
-	internal struct GroupElementP3
+    internal struct GroupElementP3
 	{
 		public FieldElement X;
 		public FieldElement Y;
@@ -54,8 +84,8 @@ namespace NATS.NKeys.NaCl.Internal.Ed25519Ref10
 
 	internal struct GroupElementPreComp
 	{
-		public FieldElement yplusx;
-		public FieldElement yminusx;
+        public FieldElement yplusx;
+        public FieldElement yminusx;
 		public FieldElement xy2d;
 
 		public GroupElementPreComp(FieldElement yplusx, FieldElement yminusx, FieldElement xy2d)
