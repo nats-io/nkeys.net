@@ -67,49 +67,49 @@
 
 namespace NATS.NKeys.NaCl.Internal.Ed25519Ref10
 {
-	internal static partial class GroupOperations
-	{
-		public static int ge_frombytes_negate_vartime(out GroupElementP3 h, byte[] data, int offset)
-		{
-			FieldElement u, v, v3, vxx, check;
+    internal static partial class GroupOperations
+    {
+        public static int ge_frombytes_negate_vartime(out GroupElementP3 h, byte[] data, int offset)
+        {
+            FieldElement u, v, v3, vxx, check;
 
-			NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_frombytes(out h.Y, data, offset);
-			NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_1(out h.Z);
-			NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_sq(out u, ref  h.Y);
-			NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_mul(out v, ref  u, ref  NATS.NKeys.NaCl.Internal.Ed25519Ref10.LookupTables.d);
-			NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_sub(out u, ref  u, ref  h.Z);       /* u = y^2-1 */
-			NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_add(out v, ref  v, ref  h.Z);       /* v = dy^2+1 */
+            NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_frombytes(out h.Y, data, offset);
+            NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_1(out h.Z);
+            NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_sq(out u, ref h.Y);
+            NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_mul(out v, ref u, ref NATS.NKeys.NaCl.Internal.Ed25519Ref10.LookupTables.d);
+            NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_sub(out u, ref u, ref h.Z);       /* u = y^2-1 */
+            NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_add(out v, ref v, ref h.Z);       /* v = dy^2+1 */
 
-			NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_sq(out v3, ref  v);
-			NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_mul(out v3, ref  v3, ref  v);        /* v3 = v^3 */
-			NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_sq(out h.X, ref  v3);
-			NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_mul(out h.X, ref  h.X, ref  v);
-			NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_mul(out h.X, ref  h.X, ref  u);    /* x = uv^7 */
+            NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_sq(out v3, ref v);
+            NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_mul(out v3, ref v3, ref v);        /* v3 = v^3 */
+            NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_sq(out h.X, ref v3);
+            NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_mul(out h.X, ref h.X, ref v);
+            NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_mul(out h.X, ref h.X, ref u);    /* x = uv^7 */
 
-			NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_pow22523(out h.X, ref  h.X); /* x = (uv^7)^((q-5)/8) */
-			NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_mul(out h.X, ref  h.X, ref  v3);
-			NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_mul(out h.X, ref  h.X, ref  u);    /* x = uv^3(uv^7)^((q-5)/8) */
+            NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_pow22523(out h.X, ref h.X); /* x = (uv^7)^((q-5)/8) */
+            NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_mul(out h.X, ref h.X, ref v3);
+            NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_mul(out h.X, ref h.X, ref u);    /* x = uv^3(uv^7)^((q-5)/8) */
 
-			NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_sq(out vxx, ref  h.X);
-			NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_mul(out vxx, ref  vxx, ref  v);
-			NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_sub(out check, ref  vxx, ref  u);    /* vx^2-u */
-			if (NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_isnonzero(ref check) != 0)
-			{
-				NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_add(out check, ref  vxx, ref  u);  /* vx^2+u */
-				if (NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_isnonzero(ref check) != 0)
-				{
-					h = default(GroupElementP3);
-					return -1;
-				}
-				NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_mul(out h.X, ref  h.X, ref  NATS.NKeys.NaCl.Internal.Ed25519Ref10.LookupTables.sqrtm1);
-			}
+            NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_sq(out vxx, ref h.X);
+            NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_mul(out vxx, ref vxx, ref v);
+            NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_sub(out check, ref vxx, ref u);    /* vx^2-u */
+            if (NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_isnonzero(ref check) != 0)
+            {
+                NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_add(out check, ref vxx, ref u);  /* vx^2+u */
+                if (NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_isnonzero(ref check) != 0)
+                {
+                    h = default(GroupElementP3);
+                    return -1;
+                }
+                NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_mul(out h.X, ref h.X, ref NATS.NKeys.NaCl.Internal.Ed25519Ref10.LookupTables.sqrtm1);
+            }
 
-			if (NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_isnegative(ref h.X) == (data[offset + 31] >> 7))
-				NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_neg(out h.X, ref h.X);
+            if (NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_isnegative(ref h.X) == (data[offset + 31] >> 7))
+                NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_neg(out h.X, ref h.X);
 
-			NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_mul(out h.T, ref h.X, ref h.Y);
-			return 0;
-		}
+            NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_mul(out h.T, ref h.X, ref h.Y);
+            return 0;
+        }
 
-	}
+    }
 }

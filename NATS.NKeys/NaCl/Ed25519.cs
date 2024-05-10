@@ -99,7 +99,8 @@ namespace NATS.NKeys.NaCl
         public static bool Verify(ArraySegment<byte> signature, ArraySegment<byte> message, ArraySegment<byte> publicKey)
         {
             // Contract.Requires<ArgumentException>(signature.Count == SignatureSize && publicKey.Count == PublicKeySize);
-            if (signature.Count != SignatureSize || publicKey.Count != PublicKeySize) throw new ArgumentException();
+            if (signature.Count != SignatureSize || publicKey.Count != PublicKeySize)
+                throw new ArgumentException();
 
             return Ed25519Operations.crypto_sign_verify(signature.Array, signature.Offset, message.Array, message.Offset, message.Count, publicKey.Array, publicKey.Offset);
         }
@@ -114,9 +115,11 @@ namespace NATS.NKeys.NaCl
         public static bool Verify(byte[] signature, byte[] message, byte[] publicKey)
         {
             // Contract.Requires<ArgumentNullException>(signature != null && message != null && publicKey != null);
-            if (signature == null || message == null || publicKey == null) throw new ArgumentException();
+            if (signature == null || message == null || publicKey == null)
+                throw new ArgumentException();
             // Contract.Requires<ArgumentException>(signature.Length == SignatureSize && publicKey.Length == PublicKeySize);
-            if (signature.Length != SignatureSize || publicKey.Length != PublicKeySize) throw new ArgumentException();
+            if (signature.Length != SignatureSize || publicKey.Length != PublicKeySize)
+                throw new ArgumentException();
 
             return Ed25519Operations.crypto_sign_verify(signature, 0, message, 0, message.Length, publicKey, 0);
         }
@@ -130,9 +133,11 @@ namespace NATS.NKeys.NaCl
         public static void Sign(ArraySegment<byte> signature, ArraySegment<byte> message, ArraySegment<byte> expandedPrivateKey)
         {
             // Contract.Requires<ArgumentNullException>(signature.Array != null && message.Array != null && expandedPrivateKey.Array != null);
-            if (signature.Array == null || message.Array == null || expandedPrivateKey.Array == null) throw new ArgumentNullException();
+            if (signature.Array == null || message.Array == null || expandedPrivateKey.Array == null)
+                throw new ArgumentNullException();
             // Contract.Requires<ArgumentException>(expandedPrivateKey.Count == ExpandedPrivateKeySize);
-            if (expandedPrivateKey.Count != ExpandedPrivateKeySize) throw new ArgumentException();
+            if (expandedPrivateKey.Count != ExpandedPrivateKeySize)
+                throw new ArgumentException();
 
             Ed25519Operations.crypto_sign(signature.Array, signature.Offset, message.Array, message.Offset, message.Count, expandedPrivateKey.Array, expandedPrivateKey.Offset);
         }
@@ -145,9 +150,11 @@ namespace NATS.NKeys.NaCl
         public static byte[] Sign(byte[] message, byte[] expandedPrivateKey)
         {
             // Contract.Requires<ArgumentNullException>(message != null && expandedPrivateKey != null);
-            if (message == null || expandedPrivateKey == null) throw new ArgumentNullException();
+            if (message == null || expandedPrivateKey == null)
+                throw new ArgumentNullException();
             // Contract.Requires<ArgumentException>(expandedPrivateKey.Length == ExpandedPrivateKeySize);
-            if (expandedPrivateKey.Length != ExpandedPrivateKeySize) throw new ArgumentException();
+            if (expandedPrivateKey.Length != ExpandedPrivateKeySize)
+                throw new ArgumentException();
 
             var signature = new byte[SignatureSize];
             Sign(new ArraySegment<byte>(signature), new ArraySegment<byte>(message), new ArraySegment<byte>(expandedPrivateKey));
@@ -162,9 +169,11 @@ namespace NATS.NKeys.NaCl
         public static byte[] PublicKeyFromSeed(byte[] privateKeySeed)
         {
             // Contract.Requires<ArgumentNullException>(privateKeySeed != null);
-            if (privateKeySeed == null) throw new ArgumentNullException();
+            if (privateKeySeed == null)
+                throw new ArgumentNullException();
             // Contract.Requires<ArgumentException>(privateKeySeed.Length == PrivateKeySeedSize);
-            if (privateKeySeed.Length != PrivateKeySeedSize) throw new ArgumentException();
+            if (privateKeySeed.Length != PrivateKeySeedSize)
+                throw new ArgumentException();
 
             byte[] privateKey;
             byte[] publicKey;
@@ -181,9 +190,11 @@ namespace NATS.NKeys.NaCl
         public static byte[] ExpandedPrivateKeyFromSeed(byte[] privateKeySeed)
         {
             // Contract.Requires<ArgumentNullException>(privateKeySeed != null);
-            if (privateKeySeed == null) throw new ArgumentNullException();
+            if (privateKeySeed == null)
+                throw new ArgumentNullException();
             // Contract.Requires<ArgumentException>(privateKeySeed.Length == PrivateKeySeedSize);
-            if (privateKeySeed.Length != PrivateKeySeedSize) throw new ArgumentException();
+            if (privateKeySeed.Length != PrivateKeySeedSize)
+                throw new ArgumentException();
 
             byte[] privateKey;
             byte[] publicKey;
@@ -201,9 +212,11 @@ namespace NATS.NKeys.NaCl
         public static void KeyPairFromSeed(out byte[] publicKey, out byte[] expandedPrivateKey, byte[] privateKeySeed)
         {
             // Contract.Requires<ArgumentNullException>(privateKeySeed != null);
-            if (privateKeySeed == null) throw new ArgumentNullException();
+            if (privateKeySeed == null)
+                throw new ArgumentNullException();
             // Contract.Requires<ArgumentException>(privateKeySeed.Length == PrivateKeySeedSize);
-            if (privateKeySeed.Length != PrivateKeySeedSize) throw new ArgumentException();
+            if (privateKeySeed.Length != PrivateKeySeedSize)
+                throw new ArgumentException();
 
             var pk = new byte[PublicKeySize];
             var sk = new byte[ExpandedPrivateKeySize];
@@ -222,16 +235,19 @@ namespace NATS.NKeys.NaCl
         public static void KeyPairFromSeed(ArraySegment<byte> publicKey, ArraySegment<byte> expandedPrivateKey, ArraySegment<byte> privateKeySeed)
         {
             // Contract.Requires<ArgumentNullException>(publicKey.Array != null && expandedPrivateKey.Array != null && privateKeySeed.Array != null);
-            if (publicKey.Array == null || expandedPrivateKey.Array == null || privateKeySeed.Array == null) throw new ArgumentNullException();
+            if (publicKey.Array == null || expandedPrivateKey.Array == null || privateKeySeed.Array == null)
+                throw new ArgumentNullException();
             // Contract.Requires<ArgumentException>(expandedPrivateKey.Count == ExpandedPrivateKeySize && privateKeySeed.Count == PrivateKeySeedSize);
-            if (expandedPrivateKey.Count != ExpandedPrivateKeySize || privateKeySeed.Count != PrivateKeySeedSize) throw new ArgumentException();
+            if (expandedPrivateKey.Count != ExpandedPrivateKeySize || privateKeySeed.Count != PrivateKeySeedSize)
+                throw new ArgumentException();
             // Contract.Requires<ArgumentException>(publicKey.Count == PublicKeySize);
-            if (publicKey.Count != PublicKeySize) throw new ArgumentException();
+            if (publicKey.Count != PublicKeySize)
+                throw new ArgumentException();
 
-                Ed25519Operations.crypto_sign_keypair(
-                publicKey.Array, publicKey.Offset,
-                expandedPrivateKey.Array, expandedPrivateKey.Offset,
-                privateKeySeed.Array, privateKeySeed.Offset);
+            Ed25519Operations.crypto_sign_keypair(
+            publicKey.Array, publicKey.Offset,
+            expandedPrivateKey.Array, expandedPrivateKey.Offset,
+            privateKeySeed.Array, privateKeySeed.Offset);
         }
     }
 }

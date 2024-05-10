@@ -1,4 +1,4 @@
-﻿// Copyright 2019 The NATS Authors
+// Copyright 2019 The NATS Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -115,12 +115,12 @@ namespace NATS.NKeys
         {
             switch (prefixByte)
             {
-                case PrefixByteServer:
-                case PrefixByteCluster:
-                case PrefixByteOperator:
-                case PrefixByteAccount:
-                case PrefixByteUser:
-                    return true;
+            case PrefixByteServer:
+            case PrefixByteCluster:
+            case PrefixByteOperator:
+            case PrefixByteAccount:
+            case PrefixByteUser:
+                return true;
             }
             return false;
         }
@@ -129,11 +129,16 @@ namespace NATS.NKeys
         {
             switch (prefixByte)
             {
-                case PrefixByteServer: return PrefixType.Server;
-                case PrefixByteCluster: return PrefixType.Cluster;
-                case PrefixByteOperator: return PrefixType.Operator;
-                case PrefixByteAccount: return PrefixType.Account;
-                case PrefixByteUser: return PrefixType.User;
+            case PrefixByteServer:
+                return PrefixType.Server;
+            case PrefixByteCluster:
+                return PrefixType.Cluster;
+            case PrefixByteOperator:
+                return PrefixType.Operator;
+            case PrefixByteAccount:
+                return PrefixType.Account;
+            case PrefixByteUser:
+                return PrefixType.User;
             }
             return null;
         }
@@ -142,11 +147,16 @@ namespace NATS.NKeys
         {
             switch (type)
             {
-                case PrefixType.Server: return PrefixByteServer;
-                case PrefixType.Cluster: return PrefixByteCluster;
-                case PrefixType.Operator: return PrefixByteOperator;
-                case PrefixType.Account: return PrefixByteAccount;
-                case PrefixType.User: return PrefixByteUser;
+            case PrefixType.Server:
+                return PrefixByteServer;
+            case PrefixType.Cluster:
+                return PrefixByteCluster;
+            case PrefixType.Operator:
+                return PrefixByteOperator;
+            case PrefixType.Account:
+                return PrefixByteAccount;
+            case PrefixType.User:
+                return PrefixByteUser;
             }
             return 0;
         }
@@ -261,15 +271,18 @@ namespace NATS.NKeys
 
             var stream = new MemoryStream();
 
-            if (seed) {
+            if (seed)
+            {
                 // In order to make this human printable for both bytes, we need to do a little
                 // bit manipulation to setup for base32 encoding which takes 5 bits at a time.
-                var b1 = (byte) (PrefixByteSeed | (prefixbyte >> 5));
-                var b2 = (byte) ((prefixbyte & 31) << 3); // 31 = 00011111
+                var b1 = (byte)(PrefixByteSeed | (prefixbyte >> 5));
+                var b2 = (byte)((prefixbyte & 31) << 3); // 31 = 00011111
 
                 stream.WriteByte(b1);
                 stream.WriteByte(b2);
-            } else {
+            }
+            else
+            {
                 stream.WriteByte(prefixbyte);
             }
 
@@ -335,7 +348,7 @@ namespace NATS.NKeys
                 throw new NKeysException("Not a seed");
             }
             // reconstruct prefix byte
-            var prefixByte = (byte) ((s[0] & 7) << 5 | ((s[1] >> 3) & 31));
+            var prefixByte = (byte)((s[0] & 7) << 5 | ((s[1] >> 3) & 31));
             var pubKey = Ed25519.PublicKeyFromSeed(DecodeSeed(s));
             return Encode(prefixByte, false, pubKey);
         }

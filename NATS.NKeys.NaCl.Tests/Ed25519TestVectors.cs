@@ -1,4 +1,4 @@
-﻿#pragma warning disable SA1201
+#pragma warning disable SA1201
 
 using System;
 using System.Collections.ObjectModel;

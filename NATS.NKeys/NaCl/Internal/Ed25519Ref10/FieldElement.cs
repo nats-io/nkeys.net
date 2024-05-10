@@ -76,7 +76,8 @@ namespace NATS.NKeys.NaCl.Internal.Ed25519Ref10
         internal FieldElement(params int[] elements)
         {
             // Contract.Requires<ArgumentException>(elements.Length == 10);
-            if (elements.Length != 10) throw new ArgumentException();
+            if (elements.Length != 10)
+                throw new ArgumentException();
 
             x0 = elements[0];
             x1 = elements[1];

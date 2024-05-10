@@ -72,11 +72,12 @@ namespace NATS.NKeys.NaCl.Internal.Ed25519Ref10
         static byte equal(byte b, byte c)
         {
 
-            byte ub = b;
-            byte uc = c;
-            byte x = (byte)(ub ^ uc); /* 0: yes; 1..255: no */
+            var ub = b;
+            var uc = c;
+            var x = (byte)(ub ^ uc); /* 0: yes; 1..255: no */
             uint y = x; /* 0: yes; 1..255: no */
-            unchecked { y -= 1; } /* 4294967295: yes; 0..254: no */
+            unchecked
+            { y -= 1; } /* 4294967295: yes; 0..254: no */
             y >>= 31; /* 1: yes; 0: no */
             return (byte)y;
         }
@@ -136,7 +137,7 @@ namespace NATS.NKeys.NaCl.Internal.Ed25519Ref10
             GroupElementP2 s;
             GroupElementPreComp t;
 
-            for (int i = 0; i < 32; ++i)
+            for (var i = 0; i < 32; ++i)
             {
                 e[2 * i + 0] = (sbyte)((a[offset + i] >> 0) & 15);
                 e[2 * i + 1] = (sbyte)((a[offset + i] >> 4) & 15);
@@ -145,7 +146,7 @@ namespace NATS.NKeys.NaCl.Internal.Ed25519Ref10
             /* e[63] is between 0 and 7 */
 
             carry = 0;
-            for (int i = 0; i < 63; ++i)
+            for (var i = 0; i < 63; ++i)
             {
                 e[i] += carry;
                 carry = (sbyte)(e[i] + 8);
@@ -156,21 +157,27 @@ namespace NATS.NKeys.NaCl.Internal.Ed25519Ref10
             /* each e[i] is between -8 and 8 */
 
             ge_p3_0(out h);
-            for (int i = 1; i < 64; i += 2)
+            for (var i = 1; i < 64; i += 2)
             {
                 select(out t, i / 2, e[i]);
-                ge_madd(out r, ref h, ref t); ge_p1p1_to_p3(out h, ref r);
+                ge_madd(out r, ref h, ref t);
+                ge_p1p1_to_p3(out h, ref r);
             }
 
-            ge_p3_dbl(out r, ref h); ge_p1p1_to_p2(out s, ref r);
-            ge_p2_dbl(out r, ref s); ge_p1p1_to_p2(out s, ref r);
-            ge_p2_dbl(out r, ref s); ge_p1p1_to_p2(out s, ref r);
-            ge_p2_dbl(out r, ref s); ge_p1p1_to_p3(out h, ref r);
+            ge_p3_dbl(out r, ref h);
+            ge_p1p1_to_p2(out s, ref r);
+            ge_p2_dbl(out r, ref s);
+            ge_p1p1_to_p2(out s, ref r);
+            ge_p2_dbl(out r, ref s);
+            ge_p1p1_to_p2(out s, ref r);
+            ge_p2_dbl(out r, ref s);
+            ge_p1p1_to_p3(out h, ref r);
 
-            for (int i = 0; i < 64; i += 2)
+            for (var i = 0; i < 64; i += 2)
             {
                 select(out t, i / 2, e[i]);
-                ge_madd(out r, ref h, ref t); ge_p1p1_to_p3(out h, ref r);
+                ge_madd(out r, ref h, ref t);
+                ge_p1p1_to_p3(out h, ref r);
             }
         }
 

@@ -84,7 +84,7 @@ namespace NATS.NKeys.NaCl.Internal.Ed25519Ref10
         {
             FieldElement fr;
             FieldOperations.fe_reduce(out fr, ref f);
-            int differentBits = 0;
+            var differentBits = 0;
             differentBits |= fr.x0;
             differentBits |= fr.x1;
             differentBits |= fr.x2;

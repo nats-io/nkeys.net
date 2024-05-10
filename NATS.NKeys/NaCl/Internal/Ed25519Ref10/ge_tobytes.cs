@@ -66,18 +66,18 @@
 
 namespace NATS.NKeys.NaCl.Internal.Ed25519Ref10
 {
-	internal static partial class GroupOperations
-	{
-		public static void ge_tobytes(byte[] s, int offset, ref  GroupElementP2 h)
-		{
-			FieldElement recip;
-			FieldElement x, y;
+    internal static partial class GroupOperations
+    {
+        public static void ge_tobytes(byte[] s, int offset, ref GroupElementP2 h)
+        {
+            FieldElement recip;
+            FieldElement x, y;
 
-			NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_invert(out recip, ref h.Z);
-			NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_mul(out x, ref h.X, ref recip);
-			NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_mul(out y, ref h.Y, ref recip);
-			NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_tobytes(s, offset, ref y);
-			s[offset + 31] ^= (byte)(NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_isnegative(ref x) << 7);
-		}
-	}
+            NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_invert(out recip, ref h.Z);
+            NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_mul(out x, ref h.X, ref recip);
+            NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_mul(out y, ref h.Y, ref recip);
+            NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_tobytes(s, offset, ref y);
+            s[offset + 31] ^= (byte)(NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_isnegative(ref x) << 7);
+        }
+    }
 }

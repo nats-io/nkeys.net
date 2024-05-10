@@ -89,8 +89,10 @@ namespace NATS.NKeys.NaCl
         /// <returns>True if arrays are equal</returns>
         public static bool ConstantTimeEquals(byte[] x, byte[] y)
         {
-            if (x == null) throw new ArgumentNullException(nameof(x));
-            if (y == null) throw new ArgumentNullException(nameof(y));
+            if (x == null)
+                throw new ArgumentNullException(nameof(x));
+            if (y == null)
+                throw new ArgumentNullException(nameof(y));
 
             if (x.Length != y.Length)
                 return false;
@@ -110,10 +112,13 @@ namespace NATS.NKeys.NaCl
         /// <returns>True if contents of x and y are equal</returns>
         public static bool ConstantTimeEquals(ArraySegment<byte> x, ArraySegment<byte> y)
         {
-            if (x == null) throw new ArgumentNullException(nameof(x));
-            if (y == null) throw new ArgumentNullException(nameof(y));
+            if (x == null)
+                throw new ArgumentNullException(nameof(x));
+            if (y == null)
+                throw new ArgumentNullException(nameof(y));
 
-            if (x.Array == null || y.Array == null) throw new ArgumentNullException();
+            if (x.Array == null || y.Array == null)
+                throw new ArgumentNullException();
             if (x.Count != y.Count)
                 return false;
             return InternalConstantTimeEquals(x.Array, x.Offset, y.Array, y.Offset, x.Count) != 0;
@@ -136,21 +141,25 @@ namespace NATS.NKeys.NaCl
         public static bool ConstantTimeEquals(byte[] x, int xOffset, byte[] y, int yOffset, int length)
         {
             // Contract.Requires<ArgumentNullException>(x != null && y != null);
-            if (x == null || y == null) throw new ArgumentNullException();
+            if (x == null || y == null)
+                throw new ArgumentNullException();
             // Contract.Requires<ArgumentOutOfRangeException>(xOffset >= 0 && yOffset >= 0 && length >= 0);
-            if (xOffset < 0 || yOffset < 0 || length < 0) throw new ArgumentOutOfRangeException();
+            if (xOffset < 0 || yOffset < 0 || length < 0)
+                throw new ArgumentOutOfRangeException();
             // Contract.Requires<ArgumentException>(xOffset + length <= x.Length);
-            if (xOffset + length > x.Length) throw new ArgumentException();
+            if (xOffset + length > x.Length)
+                throw new ArgumentException();
             // Contract.Requires<ArgumentException>(yOffset + length <= y.Length);
-            if (yOffset + length > y.Length) throw new ArgumentException();
+            if (yOffset + length > y.Length)
+                throw new ArgumentException();
 
             return InternalConstantTimeEquals(x, xOffset, y, yOffset, length) != 0;
         }
 
         private static uint InternalConstantTimeEquals(byte[] x, int xOffset, byte[] y, int yOffset, int length)
         {
-            int differentbits = 0;
-            for (int i = 0; i < length; i++)
+            var differentbits = 0;
+            for (var i = 0; i < length; i++)
                 differentbits |= x[xOffset + i] ^ y[yOffset + i];
             return (1 & (unchecked((uint)differentbits - 1) >> 8));
         }
@@ -162,7 +171,8 @@ namespace NATS.NKeys.NaCl
         public static void Wipe(byte[] data)
         {
             // Contract.Requires<ArgumentNullException>(data != null);
-            if (data == null) throw new ArgumentNullException();
+            if (data == null)
+                throw new ArgumentNullException();
             InternalWipe(data, 0, data.Length);
         }
 
@@ -175,11 +185,14 @@ namespace NATS.NKeys.NaCl
         public static void Wipe(byte[] data, int offset, int length)
         {
             // Contract.Requires<ArgumentNullException>(data != null);
-            if (data == null) throw new ArgumentNullException();
+            if (data == null)
+                throw new ArgumentNullException();
             // Contract.Requires<ArgumentOutOfRangeException>(offset >= 0 && length >= 0);
-            if (offset< 0 || length < 0) throw new ArgumentOutOfRangeException();
+            if (offset < 0 || length < 0)
+                throw new ArgumentOutOfRangeException();
             // Contract.Requires<ArgumentException>(offset + length <= data.Length);
-            if (offset + length > data.Length) throw new ArgumentException();
+            if (offset + length > data.Length)
+                throw new ArgumentException();
 
             InternalWipe(data, offset, length);
         }
@@ -225,9 +238,9 @@ namespace NATS.NKeys.NaCl
         {
             if (data == null)
                 return null;
-            char[] c = new char[data.Length * 2];
+            var c = new char[data.Length * 2];
             int b;
-            for (int i = 0; i < data.Length; i++)
+            for (var i = 0; i < data.Length; i++)
             {
                 b = data[i] >> 4;
                 c[i * 2] = (char)(55 + b + (((b - 10) >> 31) & -7));
@@ -247,9 +260,9 @@ namespace NATS.NKeys.NaCl
         {
             if (data == null)
                 return null;
-            char[] c = new char[data.Length * 2];
+            var c = new char[data.Length * 2];
             int b;
-            for (int i = 0; i < data.Length; i++)
+            for (var i = 0; i < data.Length; i++)
             {
                 b = data[i] >> 4;
                 c[i * 2] = (char)(87 + b + (((b - 10) >> 31) & -39));
@@ -271,7 +284,7 @@ namespace NATS.NKeys.NaCl
             if (hexString.Length % 2 != 0)
                 throw new FormatException("The hex string is invalid because it has an odd length");
             var result = new byte[hexString.Length / 2];
-            for (int i = 0; i < result.Length; i++)
+            for (var i = 0; i < result.Length; i++)
                 result[i] = Convert.ToByte(hexString.Substring(i * 2, 2), 16);
             return result;
         }
@@ -310,26 +323,27 @@ namespace NATS.NKeys.NaCl
         /// <returns>Encoding result</returns>
         public static string Base58Encode(byte[] input)
         {
-            if (input == null) throw new ArgumentNullException(nameof(input));
+            if (input == null)
+                throw new ArgumentNullException(nameof(input));
 
             // Decode byte[] to BigInteger
             BigInteger intData = 0;
-            for (int i = 0; i < input.Length; i++)
+            for (var i = 0; i < input.Length; i++)
             {
                 intData = intData * 256 + input[i];
             }
 
             // Encode BigInteger to Base58 string
-            string result = "";
+            var result = "";
             while (intData > 0)
             {
-                int remainder = (int)(intData % 58);
+                var remainder = (int)(intData % 58);
                 intData /= 58;
                 result = strDigits[remainder] + result;
             }
 
             // Append `1` for each leading 0 byte
-            for (int i = 0; i < input.Length && input[i] == 0; i++)
+            for (var i = 0; i < input.Length && input[i] == 0; i++)
             {
                 result = '1' + result;
             }
@@ -343,13 +357,14 @@ namespace NATS.NKeys.NaCl
         /// <returns>Byte array</returns>
         public static byte[] Base58Decode(string input)
         {
-            if (input == null) throw new ArgumentNullException(nameof(input));
+            if (input == null)
+                throw new ArgumentNullException(nameof(input));
 
             // Decode Base58 string to BigInteger
             BigInteger intData = 0;
-            for (int i = 0; i < input.Length; i++)
+            for (var i = 0; i < input.Length; i++)
             {
-                int digit = strDigits.IndexOf(input[i]); //Slow
+                var digit = strDigits.IndexOf(input[i]); //Slow
                 if (digit < 0)
                     throw new FormatException(string.Format("Invalid Base58 character `{0}` at position {1}", input[i], i));
                 intData = intData * 58 + digit;
@@ -357,7 +372,7 @@ namespace NATS.NKeys.NaCl
 
             // Encode BigInteger to byte[]
             // Leading zero bytes get encoded as leading `1` characters
-            int leadingZeroCount = input.TakeWhile(c => c == '1').Count();
+            var leadingZeroCount = input.TakeWhile(c => c == '1').Count();
             var leadingZeros = Enumerable.Repeat((byte)0, leadingZeroCount);
             var bytesWithoutLeadingZeros =
                 intData.ToByteArray()

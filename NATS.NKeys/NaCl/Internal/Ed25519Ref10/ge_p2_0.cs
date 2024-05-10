@@ -66,13 +66,13 @@
 
 namespace NATS.NKeys.NaCl.Internal.Ed25519Ref10
 {
-	internal static partial class GroupOperations
-	{
-		public static void ge_p2_0(out  GroupElementP2 h)
-		{
-			NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_0(out h.X);
-			NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_1(out h.Y);
-			NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_1(out h.Z);
-		}
-	}
+    internal static partial class GroupOperations
+    {
+        public static void ge_p2_0(out GroupElementP2 h)
+        {
+            NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_0(out h.X);
+            NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_1(out h.Y);
+            NATS.NKeys.NaCl.Internal.Ed25519Ref10.FieldOperations.fe_1(out h.Z);
+        }
+    }
 }

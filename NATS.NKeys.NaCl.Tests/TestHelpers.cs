@@ -1,4 +1,4 @@
-﻿#pragma warning disable SA1202
+#pragma warning disable SA1202
 
 using System;
 using System.Collections.Generic;

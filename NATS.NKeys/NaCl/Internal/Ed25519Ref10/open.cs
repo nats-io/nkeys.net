@@ -117,11 +117,12 @@ namespace NATS.NKeys.NaCl.Internal.Ed25519Ref10
             byte[] pk, int pkoffset)
         {
             byte[] h;
-            byte[] checkr = new byte[32];
+            var checkr = new byte[32];
             GroupElementP3 A;
             GroupElementP2 R;
 
-            if ((sig[sigoffset + 63] & 224) != 0) return false;
+            if ((sig[sigoffset + 63] & 224) != 0)
+                return false;
             if (NATS.NKeys.NaCl.Internal.Ed25519Ref10.GroupOperations.ge_frombytes_negate_vartime(out A, pk, pkoffset) != 0)
                 return false;
 

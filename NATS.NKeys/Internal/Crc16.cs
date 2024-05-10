@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS0465
+#pragma warning disable CS0465
 #pragma warning disable CS1572
 #pragma warning disable CS1573
 #pragma warning disable CS8603
@@ -76,8 +76,8 @@ namespace NATS.NKeys.Internal
 
         static internal ushort Checksum(byte[] data)
         {
-            int crc = 0;
-            foreach (byte b in data)
+            var crc = 0;
+            foreach (var b in data)
             {
                 crc = ((crc << 8) & 0xffff) ^ crc16tab[((crc >> 8) ^ (ushort)b & 0x00FF)];
             }
