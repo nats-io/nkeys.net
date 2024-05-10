@@ -1,4 +1,4 @@
-﻿using NATS.NKeys;
+using NATS.NKeys;
 
 Console.WriteLine("AOT Tests");
 
