@@ -28,21 +28,21 @@ jobs:
               6.x
               8.x
 
-#      - name: Build
-#        run: dotnet build -c Debug
-#
-#      - name: Test Core
-#        run: dotnet test -c Debug --no-build --logger:"console;verbosity=normal"
+      - name: Build
+        run: dotnet build -c Debug
+
+      - name: Test Core
+        run: dotnet test -c Debug --no-build --logger:"console;verbosity=normal"
 
       - name: Check Native AOT
         shell: bash
         run: |
-            echo "Set up for AOT compilation..."
+            echo ">> Set up for AOT compilation..."
             export exe_file=NATS.NKeys.CheckNativeAot
             export exe_type=ELF
             export dotnet_runtime_id=linux-x64
 
-            echo "Checking OS..."
+            echo ">> Checking OS..."
             if [ "${{ matrix.os }}" = "windows-latest" ]; then
               export exe_file=NATS.NKeys.CheckNativeAot.exe
               export exe_type=PE32
@@ -52,23 +52,23 @@ jobs:
               export exe_type=Mach-O
             fi
 
-            echo "Publishing..."
+            echo ">> Publishing..."
             cd NATS.NKeys.CheckNativeAot
             rm -rf bin obj
             dotnet publish -r $dotnet_runtime_id -c Release -o dist | tee output.txt
 
-            echo "Checking for warnings..."
+            echo ">> Checking for warnings..."
             grep -i warning output.txt && exit 1
 
-            echo "Executable sanity checks..."
+            echo ">> Executable sanity checks..."
             cd dist
             ls -lh
 
-            echo "Executable is of type $exe_type..."
+            echo ">> Executable is of type $exe_type..."
             file $exe_file
             file $exe_file | grep $exe_type || exit 1
 
-            echo "Executable size checks..."
+            echo ">> Executable size checks..."
             # Can't be less than a meg and not more than 10 megs.
             # Fairly arbitrary, but we want to make sure executable size
             # is reasonable so we can be somewhat sure AOT compilation
@@ -83,17 +83,17 @@ jobs:
               export filesize=$(stat -f %z $exe_file)
             fi
 
-            echo "File size: $filesize bytes"
+            echo ">> File size: $filesize bytes"
             if [ $filesize -lt 1048576 ]; then
-              echo "File is less than 1MB."
+              echo ">> File is less than 1MB."
               exit 1
             fi
             if [ $filesize -gt 10485760 ]; then
-              echo "File is more than 10MB."
+              echo ">> File is more than 10MB."
               exit 1
             fi
 
-            echo "Running executable..."
+            echo ">> Running executable..."
             ./$exe_file | tee | grep PASS || exit 1
 
-            echo "Run complete."
+            echo ">> Run complete."
