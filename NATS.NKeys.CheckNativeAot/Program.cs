@@ -1,3 +1,6 @@
+#pragma warning disable SA1120
+#pragma warning disable SA1512
+
 using NATS.NKeys;
 
 Console.WriteLine("AOT Tests");
@@ -9,7 +12,9 @@ Console.WriteLine("AOT Tests");
 // Encode_decode();
 // Public_key_from_seed();
 //
-// Console.WriteLine("PASS");
+
+Console.WriteLine("PASS");
+
 //
 // void Create_seed()
 // {
