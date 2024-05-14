@@ -1,0 +1,20 @@
+﻿#nullable enable
+NATS.NKeys.Base32
+NATS.NKeys.KeyPair
+NATS.NKeys.KeyPair.Dispose() -> void
+NATS.NKeys.KeyPair.GetPublicKey() -> string!
+NATS.NKeys.KeyPair.GetSeed() -> string!
+NATS.NKeys.KeyPair.Sign(byte[]! input) -> byte[]!
+NATS.NKeys.KeyPair.Verify(byte[]! input, byte[]! signature) -> bool
+NATS.NKeys.PrefixByte
+NATS.NKeys.PrefixByte.Account = 0 -> NATS.NKeys.PrefixByte
+NATS.NKeys.PrefixByte.Cluster = 16 -> NATS.NKeys.PrefixByte
+NATS.NKeys.PrefixByte.Operator = 112 -> NATS.NKeys.PrefixByte
+NATS.NKeys.PrefixByte.Server = 104 -> NATS.NKeys.PrefixByte
+NATS.NKeys.PrefixByte.User = 160 -> NATS.NKeys.PrefixByte
+static NATS.NKeys.Base32.Decode(string! input) -> byte[]!
+static NATS.NKeys.Base32.Encode(byte[]! input) -> string!
+static NATS.NKeys.KeyPair.CreatePair(NATS.NKeys.PrefixByte prefix) -> NATS.NKeys.KeyPair!
+static NATS.NKeys.KeyPair.CreatePair(NATS.NKeys.PrefixByte prefix, System.Security.Cryptography.RandomNumberGenerator! rng) -> NATS.NKeys.KeyPair!
+static NATS.NKeys.KeyPair.FromPublicKey(string! publicKey) -> NATS.NKeys.KeyPair!
+static NATS.NKeys.KeyPair.FromSeed(string! seed) -> NATS.NKeys.KeyPair!
