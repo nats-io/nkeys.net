@@ -1,4 +1,4 @@
-﻿namespace NATS.NKeys;
+namespace NATS.NKeys;
 
 internal static class NKeysConstants
 {

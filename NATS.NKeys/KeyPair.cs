@@ -1,4 +1,4 @@
-﻿using System.Net.Mail;
+using System.Net.Mail;
 using System.Security.Cryptography;
 using NATS.NKeys.Internal;
 using NATS.NKeys.NaCl;
