@@ -1,14 +1,10 @@
 name: Test
 
 on:
-    workflow_run:
-        workflows:
-            - Format
-        types:
-            - completed
-        pull_request: {}
-        branches:
-            - main
+  pull_request: {}
+  push:
+    branches:
+    - main
 
 jobs:
   dotnet:
