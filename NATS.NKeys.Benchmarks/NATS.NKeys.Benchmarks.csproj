@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="BenchmarkDotNet" Version="0.13.12" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\NATS.NKeys\NATS.NKeys.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Include="..\NATS.NKeys\Internal\Crc16.cs"/>
+        <Compile Include="..\NATS.NKeys\NaCl\*.cs">
+            <Link>NaCl\%(Filename)%(Extension)</Link>
+        </Compile>
+        <Compile Include="..\NATS.NKeys\NaCl\Internal\Ed25519Ref10\*.cs">
+            <Link>NaCl\Internal\Ed25519Ref10\%(Filename)%(Extension)</Link>
+        </Compile>
+    </ItemGroup>
+</Project>

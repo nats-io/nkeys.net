@@ -21,7 +21,20 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\NATS.NKeys\NATS.NKeys.csproj" />
+        <ProjectReference Include="..\NATS.NKeys\NATS.NKeys.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Include="..\NATS.NKeys.Benchmarks\NKeysReference1.cs"/>
+        <Compile Include="..\NATS.NKeys.Benchmarks\NKeysReference2.cs"/>
+        <Compile Include="..\NATS.NKeys.Benchmarks\FixedRng.cs"/>
+        <Compile Include="..\NATS.NKeys\Internal\Crc16.cs"/>
+        <Compile Include="..\NATS.NKeys\NaCl\*.cs">
+            <Link>NaCl\%(Filename)%(Extension)</Link>
+        </Compile>
+        <Compile Include="..\NATS.NKeys\NaCl\Internal\Ed25519Ref10\*.cs">
+            <Link>NaCl\Internal\Ed25519Ref10\%(Filename)%(Extension)</Link>
+        </Compile>
     </ItemGroup>
 
 </Project>

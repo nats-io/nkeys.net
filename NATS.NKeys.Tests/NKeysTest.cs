@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using NATS.NKeys.Benchmarks;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -6,27 +8,72 @@ namespace NATS.NKeys.Tests;
 
 public class NKeysTest(ITestOutputHelper output)
 {
-    [Fact]
-    public void Create_seed()
+    public static IEnumerable<object[]> PrefixData
     {
-        // var seed = NKeys.CreateSeed(NKeys.PrefixByte.User);
-        // output.WriteLine($"pair.PublicKey: {seed}");
-        //
-        // var pair = NKeys.FromSeed(seed);
-        // var bytes = pair.Sign([123, 4]);
-        //
-        // var verify = pair.Verify(bytes, [123, 4]);
-        // output.WriteLine($"verify: {verify}");
-        //
-        // var kp = KeyPair.FromSeed(seed);
-        // Assert.True(kp.Verify([123, 4], bytes));
-        // Assert.True(pair.Verify(kp.Sign([123, 4]), [123, 4]));
-        //
-        // var encode = NKeys.Encode(NKeys.PrefixByte.User, false, pair.PublicKey);
-        // output.WriteLine($"encode: {encode}");
-        //
-        // var publicKey = NKeys.PublicKeyFromSeed(seed);
-        // output.WriteLine($"PublicKey: {publicKey}");
+        get
+        {
+            yield return [PrefixByte.User, 'U'];
+            yield return [PrefixByte.Account, 'A'];
+            yield return [PrefixByte.Operator, 'O'];
+            yield return [PrefixByte.Cluster, 'C'];
+            yield return [PrefixByte.Server, 'N'];
+        }
+    }
+
+    [MemberData(nameof(PrefixData))]
+    [Theory]
+    public void Create_key_pair(PrefixByte prefix, char initial)
+    {
+        var pair = KeyPair.CreatePair(prefix);
+        Assert.NotNull(pair);
+        Assert.NotEmpty(pair.GetSeed());
+        Assert.NotEmpty(pair.GetPublicKey());
+        Assert.Equal(initial, pair.GetPublicKey()[0]);
+        Assert.Equal($"S{initial}", pair.GetSeed().Substring(0, 2));
+
+        var signature = new Memory<byte>(new byte[64]);
+        var message = new ReadOnlyMemory<byte>([1, 2]);
+        var corrupt = new ReadOnlyMemory<byte>([1, 2, 3]);
+        pair.Sign(message, signature);
+        Assert.True(pair.Verify(message, signature));
+        Assert.False(pair.Verify(corrupt, signature));
+
+        // check against reference implementations
+        var pair1Seed = NKeysReference1.FromEncodedSeed(pair.GetSeed());
+        var signature1 = NKeysReference1.Sign(pair1Seed, message.ToArray());
+        Assert.Equal(signature.Span.ToArray(), signature1);
+        Assert.True(NKeysReference1.VerifyUsingSeed(pair1Seed, message.ToArray(), signature.ToArray()));
+        Assert.True(NKeysReference1.VerifyUsingSeed(pair1Seed, message.ToArray(), signature1));
+        Assert.False(NKeysReference1.VerifyUsingSeed(pair1Seed, corrupt.ToArray(), signature1));
+
+        var pair2 = NKeysUtilsReference2.FromSeed(pair.GetSeed());
+        var signature2 = pair2.Sign(message.ToArray());
+        Assert.Equal(signature.Span.ToArray(), signature2);
+    }
+
+    [MemberData(nameof(PrefixData))]
+    [Theory]
+    public void Create_with_rng(PrefixByte prefix, char initial)
+    {
+        var rng = new FixedRng();
+
+        var pair = KeyPair.CreatePair(prefix, rng);
+        var seed = pair.GetSeed();
+        var pub = pair.GetPublicKey();
+
+        var sk = NKeysReference1.NewSeed(rng);
+
+        output.WriteLine($"seed: {NKeysReference1.GetEncodedSeed(initial, sk)}");
+        output.WriteLine($"seed: {seed}");
+        Assert.Equal(NKeysReference1.GetEncodedSeed(initial, sk), seed);
+
+        output.WriteLine($"public: {NKeysReference1.GetEncodedPublicKey(initial, sk)}");
+        output.WriteLine($"public: {pub}");
+        Assert.Equal(NKeysReference1.GetEncodedPublicKey(initial, sk), pub);
+
+        Assert.Equal('S', seed[0]);
+        Assert.Equal(initial, seed[1]);
+        Assert.Equal(initial, pub[0]);
     }
 
     [Fact]

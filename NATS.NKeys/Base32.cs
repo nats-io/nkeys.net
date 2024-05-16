@@ -1,124 +1,106 @@
-#pragma warning disable CS8603 // Possible null reference return.
-#pragma warning disable SA1513
-#pragma warning disable SA1005
-#pragma warning disable SA1201
+#pragma warning disable SA1512, SA1515
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable SuggestVarOrType_BuiltInTypes
 
-// Borrowed from:  https://stackoverflow.com/a/7135008
-namespace NATS.NKeys
+using System.Runtime.CompilerServices;
+
+namespace NATS.NKeys;
+
+public static class Base32
 {
-    public static class Base32
+    public static int FromBase32(ReadOnlySpan<char> encoded, Span<byte> result)
     {
-        public static byte[] Decode(string input)
+        int currentByte = 0;
+        int bitsRemaining = 8;
+        int outputLength = 0;
+
+        foreach (var currentChar in encoded)
         {
-            if (input == null || input.Length == 0)
+            if (currentChar is >= 'A' and <= 'Z')
+                currentByte = (currentByte << 5) | (currentChar - 'A');
+            else if (currentChar is >= '2' and <= '7')
+                currentByte = (currentByte << 5) | (currentChar - '2' + 26);
+            else if (currentChar == '=')
+                continue;
+            else
+                ThrowInvalidBase32CharacterException();
+
+            bitsRemaining -= 5;
+            if (bitsRemaining <= 0)
             {
-                throw new ArgumentNullException(nameof(input));
+                result[outputLength++] = (byte)(currentByte >> -bitsRemaining);
+                currentByte &= (1 << -bitsRemaining) - 1;
+                bitsRemaining += 8;
             }
-
-            input = input.TrimEnd('='); //remove padding characters
-
-            var byteCount = input.Length * 5 / 8; // this must be TRUNCATED
-            var returnArray = new byte[byteCount];
-
-            byte curByte = 0, bitsRemaining = 8;
-            int mask = 0, arrayIndex = 0;
-
-            for (var index = 0; index < input.Length; index++)
-            {
-                var c = input[index];
-                var cValue = CharToValue(c);
-
-                if (bitsRemaining > 5)
-                {
-                    mask = cValue << (bitsRemaining - 5);
-                    curByte = (byte)(curByte | mask);
-                    bitsRemaining -= 5;
-                }
-                else
-                {
-                    mask = cValue >> (5 - bitsRemaining);
-                    curByte = (byte)(curByte | mask);
-                    returnArray[arrayIndex++] = curByte;
-                    curByte = (byte)(cValue << (3 + bitsRemaining));
-                    bitsRemaining += 3;
-                }
-            }
-
-            // if we didn't end with a full byte
-            if (arrayIndex != byteCount)
-            {
-                returnArray[arrayIndex] = curByte;
-            }
-
-            return returnArray;
         }
 
-        public static string Encode(byte[] input)
-        {
-            if (input == null || input.Length == 0)
-            {
-                throw new ArgumentNullException("input");
-            }
-
-            var charCount = (int)Math.Ceiling(input.Length / 5d) * 8;
-            var returnArray = new char[charCount];
-
-            byte nextChar = 0, bitsRemaining = 5;
-            var arrayIndex = 0;
-
-            foreach (var b in input)
-            {
-                nextChar = (byte)(nextChar | (b >> (8 - bitsRemaining)));
-                returnArray[arrayIndex++] = ValueToChar(nextChar);
-
-                if (bitsRemaining < 4)
-                {
-                    nextChar = (byte)((b >> (3 - bitsRemaining)) & 31);
-                    returnArray[arrayIndex++] = ValueToChar(nextChar);
-                    bitsRemaining += 5;
-                }
-
-                bitsRemaining -= 3;
-                nextChar = (byte)((b << bitsRemaining) & 31);
-            }
-
-            // if we didn't end with a full char
-            if (arrayIndex < charCount)
-            {
-                returnArray[arrayIndex++] = ValueToChar(nextChar);
-
-                // NOTE: Base32 padding omitted
-            }
-
-            return new string(returnArray, 0, arrayIndex);
-        }
-
-        private static int CharToValue(char c)
-        {
-            var value = (int)c;
-
-            // 65-90 == uppercase letters
-            if (value < 91 && value > 64)
-                return value - 65;
-
-            // 50-55 == numbers 2-7
-            if (value < 56 && value > 49)
-                return value - 24;
-
-            // 97-122 == lowercase letters
-            if (value < 123 && value > 96)
-                return value - 97;
-
-            throw new ArgumentException("Character is not a Base32 character.", "c");
-        }
-
-        private static char ValueToChar(byte b)
-        {
-            if (b < 26)
-                return (char)(b + 65);
-            if (b < 32)
-                return (char)(b + 24);
-            throw new ArgumentException("Byte is not a value Base32 value.", "b");
-        }
+        return outputLength;
     }
+
+    public static int ToBase32(ReadOnlySpan<byte> data, Span<char> output)
+    {
+        int outputLen = GetEncodedLength(data);
+        if (output.Length < outputLen)
+            ThrowInsufficientSpaceException();
+
+        int buffer = 0;
+        int bufferBits = 0;
+        int outputIndex = 0;
+
+        var base32 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"u8;
+        var charsPtr = output;
+        var dataPtr = data;
+        for (int i = 0; i < data.Length; i++)
+        {
+            buffer = (buffer << 8) | dataPtr[i];
+            bufferBits += 8;
+
+            while (bufferBits >= 5)
+            {
+                charsPtr[outputIndex++] = (char)base32[(buffer >> (bufferBits - 5)) & 0x1F];
+                bufferBits -= 5;
+            }
+        }
+
+        if (bufferBits > 0)
+        {
+            charsPtr[outputIndex++] = (char)base32[(buffer << (5 - bufferBits)) & 0x1F];
+        }
+
+        return outputIndex;
+    }
+
+    public static int GetDataLength(ReadOnlySpan<char> encoded)
+    {
+        var length = 0;
+        foreach (var currentChar in encoded)
+        {
+            if (currentChar is >= 'A' and <= 'Z' or >= '2' and <= '7')
+                length++;
+            else if (currentChar != '=')
+                ThrowInvalidBase32CharacterException();
+        }
+
+        return length * 5 / 8;
+    }
+
+    public static int GetEncodedLength(ReadOnlySpan<byte> data)
+    {
+        var bitsCount = data.Length * 8;
+        var rem = bitsCount % 5;
+        if (rem > 0)
+        {
+            bitsCount += 5 - rem;
+        }
+
+        int outputLen = bitsCount / 5;
+
+        return outputLen;
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void ThrowInsufficientSpaceException() => throw new ArgumentException("Insufficient space in output buffer");
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void ThrowInvalidBase32CharacterException() => throw new ArgumentException("Invalid base32 character");
 }

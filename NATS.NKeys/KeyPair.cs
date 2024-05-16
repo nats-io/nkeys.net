@@ -1,4 +1,5 @@
-using System.Net.Mail;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using NATS.NKeys.Internal;
 using NATS.NKeys.NaCl;
@@ -9,13 +10,15 @@ public sealed class KeyPair : IDisposable
 {
     private readonly PrefixByte _type;
     private readonly byte[] _seed;
-    private readonly byte[] _publicKey;
+    private readonly byte[] _sk;
+    private readonly byte[] _pk;
 
-    private KeyPair(PrefixByte type, byte[] seed, byte[] publicKey)
+    private KeyPair(PrefixByte type, byte[] seed, byte[] sk, byte[] pk)
     {
         _type = type;
         _seed = seed;
-        _publicKey = publicKey;
+        _sk = sk;
+        _pk = pk;
     }
 
     public static KeyPair FromPublicKey(string publicKey)
@@ -31,13 +34,13 @@ public sealed class KeyPair : IDisposable
         var bytes = new byte[decode.Length - 1];
         Buffer.BlockCopy(decode, 1, bytes, 0, bytes.Length);
 
-        return new KeyPair(tfp.Value, Array.Empty<byte>(), bytes);
+        return new KeyPair(tfp.Value, Array.Empty<byte>(), Array.Empty<byte>(), bytes);
     }
 
     public static KeyPair FromSeed(string seed)
     {
         var userSeed = DecodeSeed(Decode(seed), out var type);
-        return new KeyPair(type, userSeed, Ed25519.PublicKeyFromSeed(userSeed));
+        return new KeyPair(type, userSeed, Ed25519.ExpandedPrivateKeyFromSeed(userSeed), Ed25519.PublicKeyFromSeed(userSeed));
     }
 
     public static KeyPair CreatePair(PrefixByte prefix)
@@ -53,30 +56,44 @@ public sealed class KeyPair : IDisposable
 
         var seed = new byte[32];
         rng.GetBytes(seed);
-        var publicKey = Ed25519.PublicKeyFromSeed(seed);
+        var sk = Ed25519.ExpandedPrivateKeyFromSeed(seed);
+        var pk = Ed25519.PublicKeyFromSeed(seed);
 
-        return new KeyPair(prefix, seed, publicKey);
+        return new KeyPair(prefix, seed, sk, pk);
     }
 
     public string GetSeed() => Encode((byte)_type, true, _seed);
 
-    public string GetPublicKey() => Encode((byte)_type, false, _publicKey);
+    public string GetPublicKey() => Encode((byte)_type, false, _pk);
 
-    public byte[] Sign(byte[] input)
+    public void Sign(in ReadOnlyMemory<byte> message, Memory<byte> signature)
     {
-        var privateKey = Ed25519.ExpandedPrivateKeyFromSeed(_seed);
-        var rv = Ed25519.Sign(input, privateKey);
-        CryptoBytes.Wipe(privateKey);
-        return rv;
+        if (!MemoryMarshal.TryGetArray(message, out var inputArray))
+            ThrowCouldNotGetArrayException(nameof(message));
+
+        ReadOnlyMemory<byte> readOnlyMemory = signature;
+        if (!MemoryMarshal.TryGetArray(readOnlyMemory, out var signatureArray))
+            ThrowCouldNotGetArrayException(nameof(signature));
+
+        Ed25519.Sign(signatureArray, inputArray, new ArraySegment<byte>(_sk));
     }
 
-    public bool Verify(byte[] input, byte[] signature) =>
-        Ed25519.Verify(signature, input, _publicKey);
+    public bool Verify(in ReadOnlyMemory<byte> message, in ReadOnlyMemory<byte> signature)
+    {
+        if (!MemoryMarshal.TryGetArray(message, out var messageArray))
+            ThrowCouldNotGetArrayException(nameof(message));
+
+        if (!MemoryMarshal.TryGetArray(signature, out var signatureArray))
+            ThrowCouldNotGetArrayException(nameof(signature));
+
+        return Ed25519.Verify(signatureArray, messageArray, new ArraySegment<byte>(_pk));
+    }
 
     public void Dispose()
     {
         CryptoBytes.Wipe(_seed);
-        CryptoBytes.Wipe(_publicKey);
+        CryptoBytes.Wipe(_sk);
+        CryptoBytes.Wipe(_pk);
     }
 
     private static string Encode(byte prefixByte, bool seed, byte[] src)
@@ -111,12 +128,19 @@ public sealed class KeyPair : IDisposable
         var checksum = BitConverter.GetBytes(Crc16.Checksum(stream.ToArray()));
         stream.Write(checksum, 0, checksum.Length);
 
-        return Base32.Encode(stream.ToArray());
+        var buffer = stream.ToArray();
+        var length = Base32.GetEncodedLength(buffer);
+        var chars = new char[length];
+        Base32.ToBase32(buffer, chars);
+        return new string(chars);
     }
 
     private static byte[] Decode(string src)
     {
-        var raw = Base32.Decode(src);
+        var length = Base32.GetDataLength(src.ToArray());
+        var raw = new byte[length];
+        Base32.FromBase32(src.ToArray(), raw);
+
         var crc = (ushort)(raw[raw.Length - 2] | raw[raw.Length - 1] << 8);
 
         // trim off the CRC16
@@ -182,4 +206,7 @@ public sealed class KeyPair : IDisposable
             or NKeysConstants.PrefixByteCurve => true,
         _ => false,
     };
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void ThrowCouldNotGetArrayException(string param) => throw new NKeysException($"Could not get {param} array");
 }

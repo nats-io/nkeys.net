@@ -19,6 +19,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\NATS.NKeys\NATS.NKeys.csproj" />
+        <Compile Include="..\NATS.NKeys\NaCl\*.cs">
+            <Link>NaCl\%(Filename)%(Extension)</Link>
+        </Compile>
+        <Compile Include="..\NATS.NKeys\NaCl\Internal\Ed25519Ref10\*.cs">
+            <Link>NaCl\Internal\Ed25519Ref10\%(Filename)%(Extension)</Link>
+        </Compile>
     </ItemGroup>
 </Project>

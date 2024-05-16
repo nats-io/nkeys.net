@@ -41,6 +41,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NATS.NKeys.CheckNativeAot",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{20F532D4-431E-4C8A-849F-188C2F67B06D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NATS.NKeys.Benchmarks", "NATS.NKeys.Benchmarks\NATS.NKeys.Benchmarks.csproj", "{3D66B7B0-2CA9-4A3E-93CE-6AD0F3EA1F9D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -70,6 +72,10 @@ Global
 		{20F532D4-431E-4C8A-849F-188C2F67B06D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{20F532D4-431E-4C8A-849F-188C2F67B06D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{20F532D4-431E-4C8A-849F-188C2F67B06D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D66B7B0-2CA9-4A3E-93CE-6AD0F3EA1F9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D66B7B0-2CA9-4A3E-93CE-6AD0F3EA1F9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D66B7B0-2CA9-4A3E-93CE-6AD0F3EA1F9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D66B7B0-2CA9-4A3E-93CE-6AD0F3EA1F9D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{27BEA938-4123-4AE8-8640-EFF320918101} = {6A64D5FF-ED5C-427E-92E9-486354041BCD}
