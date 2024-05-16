@@ -2,4 +2,4 @@
 
 Console.WriteLine("Hello, World!");
 
-string base64String = Convert.ToBase64String(new ReadOnlySpan<byte>());
+var base64String = Convert.ToBase64String(default(ReadOnlySpan<byte>));

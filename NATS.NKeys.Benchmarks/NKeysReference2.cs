@@ -130,11 +130,11 @@ public class NKeysUtilsReference2
     /// <returns></returns>
     public static byte[] Decode(string src)
     {
-        #if NETFRAMEWORK
+#if NETFRAMEWORK
         var raw = NKeysReference2Base32.Decode(src.ToCharArray());
-        #else
+#else
         var raw = NKeysReference2Base32.Decode(src);
-        #endif
+#endif
         var crc = (ushort)(raw[raw.Length - 2] | raw[raw.Length - 1] << 8);
 
         // trim off the CRC16

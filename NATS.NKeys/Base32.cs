@@ -10,9 +10,9 @@ public static class Base32
 {
     public static int FromBase32(ReadOnlySpan<char> encoded, Span<byte> result)
     {
-        int currentByte = 0;
-        int bitsRemaining = 8;
-        int outputLength = 0;
+        var currentByte = 0;
+        var bitsRemaining = 8;
+        var outputLength = 0;
 
         foreach (var currentChar in encoded)
         {
@@ -39,18 +39,18 @@ public static class Base32
 
     public static int ToBase32(ReadOnlySpan<byte> data, Span<char> output)
     {
-        int outputLen = GetEncodedLength(data);
+        var outputLen = GetEncodedLength(data);
         if (output.Length < outputLen)
             ThrowInsufficientSpaceException();
 
-        int buffer = 0;
-        int bufferBits = 0;
-        int outputIndex = 0;
+        var buffer = 0;
+        var bufferBits = 0;
+        var outputIndex = 0;
 
         var base32 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"u8;
         var charsPtr = output;
         var dataPtr = data;
-        for (int i = 0; i < data.Length; i++)
+        for (var i = 0; i < data.Length; i++)
         {
             buffer = (buffer << 8) | dataPtr[i];
             bufferBits += 8;
@@ -93,7 +93,7 @@ public static class Base32
             bitsCount += 5 - rem;
         }
 
-        int outputLen = bitsCount / 5;
+        var outputLen = bitsCount / 5;
 
         return outputLen;
     }
