@@ -3,6 +3,7 @@ using System.IO;
 using System.Security.Cryptography;
 using NATS.NKeys.NaCl;
 
+// Taken from NATS.Client.Core for comparison
 namespace NATS.NKeys.Benchmarks;
 
 /// <summary>

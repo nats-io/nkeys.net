@@ -76,71 +76,28 @@ public class NKeysTest(ITestOutputHelper output)
         Assert.Equal(initial, pub[0]);
     }
 
-    [Fact]
-    public void Encode_decode()
+    [MemberData(nameof(PrefixData))]
+    [Theory]
+    public void Create_seed_for_prefix(PrefixByte prefix, char initial)
     {
-        // var a = new byte[32];
-        // var b = NKeys.DecodeSeed(NKeys.Decode(NKeys.Encode((NKeys.PrefixByte)(20 << 3), true, a)), out _);
-        // Assert.Equal(a, b);
-        //
-        // var rnd = new Random();
-        // rnd.NextBytes(a);
-        // b = NKeys.DecodeSeed(NKeys.Decode(NKeys.Encode((NKeys.PrefixByte)(20 << 3), true, a)), out _);
-        // Assert.Equal(a, b);
-    }
-
-    [Fact]
-    public void Create_user_seed()
-    {
-        // var user = NKeys.CreateSeed(NKeys.PrefixByte.User);
-        // Assert.NotEmpty(user);
-        // Assert.False(user.EndsWith("=", StringComparison.Ordinal));
-        // Assert.NotNull(NKeys.FromSeed(user));
-        // var pk = NKeys.PublicKeyFromSeed(user);
-        // Assert.Equal('U', pk[0]);
-    }
-
-    [Fact]
-    public void Create_account_seed()
-    {
-        // var acc = NKeys.CreateSeed(NKeys.PrefixByte.Account);
-        // Assert.NotEmpty(acc);
-        // Assert.False(acc.EndsWith("=", StringComparison.Ordinal));
-        // Assert.NotNull(NKeys.FromSeed(acc));
-        // var pk = NKeys.PublicKeyFromSeed(acc);
-        // Assert.Equal('A', pk[0]);
-    }
-
-    [Fact]
-    public void Create_operator_seed()
-    {
-        // var op = NKeys.CreateSeed(NKeys.PrefixByte.Operator);
-        // Assert.NotEmpty(op);
-        // Assert.False(op.EndsWith("=", StringComparison.Ordinal));
-        // Assert.NotNull(NKeys.FromSeed(op));
-        // var pk = NKeys.PublicKeyFromSeed(op);
-        // Assert.Equal('O', pk[0]);
-        var kp = KeyPair.CreatePair(PrefixByte.Operator);
+        var kp = KeyPair.CreatePair(prefix);
         Assert.NotEmpty(kp.GetSeed());
         Assert.False(kp.GetSeed().EndsWith("=", StringComparison.Ordinal));
-        Assert.Equal('O', kp.GetPublicKey()[0]);
-
-        // var kp2 = KeyPair.FromSeed(op);
-        // Assert.Equal(pk, kp2.GetPublicKey());
+        Assert.Equal(initial, kp.GetPublicKey()[0]);
     }
 
     [Fact]
     public void Public_key_from_seed()
     {
-        // // using nsc generated seeds for testing
-        // var pk = NKeys.PublicKeyFromSeed("SOAELH6NJCEK4HST5644G4HK7TOAFZGRRJHNM4EUKUY7PPNDLIKO5IH4JM");
-        // Assert.Equal("ODPWIBQJVIQ42462QAFI2RKJC4RZHCQSIVPRDDHWFCJAP52NRZK6Z2YC", pk);
-        //
-        // pk = NKeys.PublicKeyFromSeed("SAANWFZ3JINNPERWT3ALE45U7GYT2ZDW6GJUIVPDKUF6GKAX6AISZJMAS4");
-        // Assert.Equal("AATEJXG7UX4HFJ6ZPRTP22P6OYZER36YYD3GVBOVW7QHLU32P4QFFTZJ", pk);
-        //
-        // pk = NKeys.PublicKeyFromSeed("SUAGDLNBWI2SGHDRYBHD63NH5FGZSVJUW2J7GAJZXWANQFLDW6G5SXZESU");
-        // Assert.Equal("UBICBTHDKQRB4LIYA6BMIJ7EA2G7YS7FIWMMVKZJE6M3HS5IVCOLKDY2", pk);
+        // using nsc generated seeds for testing
+        var kp = KeyPair.FromSeed("SOAELH6NJCEK4HST5644G4HK7TOAFZGRRJHNM4EUKUY7PPNDLIKO5IH4JM".ToCharArray());
+        Assert.Equal("ODPWIBQJVIQ42462QAFI2RKJC4RZHCQSIVPRDDHWFCJAP52NRZK6Z2YC", kp.GetPublicKey());
+
+        kp = KeyPair.FromSeed("SAANWFZ3JINNPERWT3ALE45U7GYT2ZDW6GJUIVPDKUF6GKAX6AISZJMAS4".ToCharArray());
+        Assert.Equal("AATEJXG7UX4HFJ6ZPRTP22P6OYZER36YYD3GVBOVW7QHLU32P4QFFTZJ", kp.GetPublicKey());
+
+        kp = KeyPair.FromSeed("SUAGDLNBWI2SGHDRYBHD63NH5FGZSVJUW2J7GAJZXWANQFLDW6G5SXZESU".ToCharArray());
+        Assert.Equal("UBICBTHDKQRB4LIYA6BMIJ7EA2G7YS7FIWMMVKZJE6M3HS5IVCOLKDY2", kp.GetPublicKey());
     }
 
     [Fact]
@@ -159,10 +116,23 @@ public class NKeysTest(ITestOutputHelper output)
         Assert.Equal(kp1.GetPublicKey(), kp3.GetPublicKey());
         output.WriteLine($"pk={kp3.GetPublicKey()}");
 
-        // test seed
-        {
-            var kp = KeyPair.FromSeed("SOAELH6NJCEK4HST5644G4HK7TOAFZGRRJHNM4EUKUY7PPNDLIKO5IH4JM".ToCharArray());
-            Assert.Equal("ODPWIBQJVIQ42462QAFI2RKJC4RZHCQSIVPRDDHWFCJAP52NRZK6Z2YC", kp.GetPublicKey());
-        }
+        // Using generated seeds
+        var encodedSeed = "SOAELH6NJCEK4HST5644G4HK7TOAFZGRRJHNM4EUKUY7PPNDLIKO5IH4JM".ToCharArray();
+        var encodedPublicKey = "ODPWIBQJVIQ42462QAFI2RKJC4RZHCQSIVPRDDHWFCJAP52NRZK6Z2YC".ToCharArray();
+
+        var kp4 = KeyPair.FromSeed(encodedSeed);
+        Assert.Equal(encodedPublicKey, kp4.GetPublicKey());
+        output.WriteLine($"pk={kp4.GetPublicKey()}");
+
+        var kp5 = KeyPair.FromPublicKey(encodedPublicKey);
+        Assert.Equal(encodedPublicKey, kp5.GetPublicKey());
+
+        var message = new ReadOnlyMemory<byte>([42, 43, 44]);
+        var signature = new Memory<byte>(new byte[64]);
+        kp4.Sign(message, signature);
+        Assert.True(kp5.Verify(message, signature));
+
+        var corrupt = new ReadOnlyMemory<byte>([43, 44]);
+        Assert.False(kp5.Verify(corrupt, signature));
     }
 }

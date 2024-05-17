@@ -1,12 +1,15 @@
 using System;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
 using NATS.NKeys.Internal;
 using NATS.NKeys.NaCl;
 
 namespace NATS.NKeys.Benchmarks;
 
+/// <summary>
+/// Helper class for NKeys operations implemented using a simple approach
+/// as a proof of concept and reference implementation to compare with the optimized version.
+/// </summary>
 public static class NKeysReference1
 {
     private const string Base32Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
@@ -28,7 +31,7 @@ public static class NKeysReference1
     //   CR: [ 2 bytes] CRC16 checksum of prefix and seed
     public static string GetEncodedSeed(char initial, byte[] seed)
     {
-        // Encode first two bytes to generate the prefix letters in Base32 e.g. SU for User seed
+        // Encode first two bytes to generate the prefix letters in Base32 e.g., SU for User seed
         var s = Base32Alphabet.IndexOf('S');
         var i = Base32Alphabet.IndexOf(initial);
         var prefix = new byte[2];
@@ -61,7 +64,7 @@ public static class NKeysReference1
     //   CR: [ 2 bytes] CRC16 checksum of prefix and seed
     public static string GetEncodedPublicKey(char initial, byte[] seed)
     {
-        // Encode first byte to generate the prefix letter in Base32 e.g. U for User
+        // Encode first byte to generate the prefix letter in Base32 e.g., U for User
         var i = Base32Alphabet.IndexOf(initial);
         var prefix = new byte[1];
         prefix[0] = (byte)(i << 3);

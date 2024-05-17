@@ -1,151 +1,174 @@
 #pragma warning disable SA1120
 #pragma warning disable SA1512
 
+// ReSharper disable InconsistentNaming
+// ReSharper disable SuggestVarOrType_BuiltInTypes
+// ReSharper disable SuggestVarOrType_SimpleTypes
+using System.Diagnostics;
 using NATS.NKeys;
 
-Console.WriteLine("AOT Tests");
+Console.WriteLine("Running AOT Tests...");
+var stopwatch = Stopwatch.StartNew();
 
-// Create_account_seed();
-// Create_operator_seed();
-// Create_seed();
-// Create_user_seed();
-// Encode_decode();
-// Public_key_from_seed();
-//
+foreach (var p in GetPrefixData())
+{
+    Create_seed_for_prefix(p.prefix, p.initial);
+    Create_key_pair(p.prefix, p.initial);
+}
+
+Public_key_from_seed();
+Api();
+
+stopwatch.Stop();
+
+Console.WriteLine($"[Completed in {stopwatch.Elapsed}]");
 
 Console.WriteLine("PASS");
 
-//
-// void Create_seed()
-// {
-//     Console.WriteLine($"Create_seed");
-//
-//     var seed = NKeys.CreateSeed(NKeys.PrefixByte.User);
-//     Console.WriteLine($"  pair.PublicKey: {seed}");
-//
-//     var pair = NKeys.FromSeed(seed);
-//
-//     var verify1 = pair.Verify(pair.Sign([123, 4]), [123, 4]);
-//     Console.WriteLine($"  verify1: {verify1}");
-//     Assert.True(verify1);
-//
-//     var verify2 = pair.Verify(pair.Sign([123]), [123, 4]);
-//     Console.WriteLine($"  verify2: {verify2}");
-//     Assert.False(verify2);
-//
-//     var encode = NKeys.Encode(NKeys.PrefixByte.User, false, pair.PublicKey);
-//     Console.WriteLine($"  encode: {encode}");
-//
-//     var publicKey = NKeys.PublicKeyFromSeed(seed);
-//     Console.WriteLine($"  PublicKey: {publicKey}");
-//
-//     Console.WriteLine($"OK");
-// }
-//
-// void Encode_decode()
-// {
-//     Console.WriteLine($"Encode_decode");
-//
-//     var a = new byte[32];
-//     var b = NKeys.DecodeSeed(NKeys.Decode(NKeys.Encode((NKeys.PrefixByte)(20 << 3), true, a)), out _);
-//     Assert.Equal(Convert.ToBase64String(a), Convert.ToBase64String(b));
-//
-//     var rnd = new Random();
-//     rnd.NextBytes(a);
-//     b = NKeys.DecodeSeed(NKeys.Decode(NKeys.Encode((NKeys.PrefixByte)(20 << 3), true, a)), out _);
-//     Assert.Equal(Convert.ToBase64String(a), Convert.ToBase64String(b));
-//
-//     Console.WriteLine($"OK");
-// }
-//
-// void Create_user_seed()
-// {
-//     Console.WriteLine($"Create_user_seed");
-//
-//     var user = NKeys.CreateSeed(NKeys.PrefixByte.User);
-//     Assert.NotEmpty(user);
-//     Assert.False(user.EndsWith("=", StringComparison.Ordinal));
-//     Assert.NotNull(NKeys.FromSeed(user));
-//     var pk = NKeys.PublicKeyFromSeed(user);
-//     Assert.Equal('U'.ToString(), pk[0].ToString());
-//
-//     Console.WriteLine($"OK");
-// }
-//
-// void Create_account_seed()
-// {
-//     Console.WriteLine($"Create_account_seed");
-//
-//     var acc = NKeys.CreateSeed(NKeys.PrefixByte.Account);
-//     Assert.NotEmpty(acc);
-//     Assert.False(acc.EndsWith("=", StringComparison.Ordinal));
-//     Assert.NotNull(NKeys.FromSeed(acc));
-//     var pk = NKeys.PublicKeyFromSeed(acc);
-//     Assert.Equal('A'.ToString(), pk[0].ToString());
-//
-//     Console.WriteLine($"OK");
-// }
-//
-// void Create_operator_seed()
-// {
-//     Console.WriteLine($"Create_operator_seed");
-//
-//     var op = NKeys.CreateSeed(NKeys.PrefixByte.Operator);
-//     Assert.NotEmpty(op);
-//     Assert.False(op.EndsWith("=", StringComparison.Ordinal));
-//     Assert.NotNull(NKeys.FromSeed(op));
-//     var pk = NKeys.PublicKeyFromSeed(op);
-//     Assert.Equal('O'.ToString(), pk[0].ToString());
-//
-//     Console.WriteLine($"OK");
-// }
-//
-// void Public_key_from_seed()
-// {
-//     Console.WriteLine($"Public_key_from_seed");
-//
-//     // using nsc generated seeds for testing
-//     var pk = NKeys.PublicKeyFromSeed("SOAELH6NJCEK4HST5644G4HK7TOAFZGRRJHNM4EUKUY7PPNDLIKO5IH4JM");
-//     Assert.Equal("ODPWIBQJVIQ42462QAFI2RKJC4RZHCQSIVPRDDHWFCJAP52NRZK6Z2YC", pk);
-//
-//     pk = NKeys.PublicKeyFromSeed("SAANWFZ3JINNPERWT3ALE45U7GYT2ZDW6GJUIVPDKUF6GKAX6AISZJMAS4");
-//     Assert.Equal("AATEJXG7UX4HFJ6ZPRTP22P6OYZER36YYD3GVBOVW7QHLU32P4QFFTZJ", pk);
-//
-//     pk = NKeys.PublicKeyFromSeed("SUAGDLNBWI2SGHDRYBHD63NH5FGZSVJUW2J7GAJZXWANQFLDW6G5SXZESU");
-//     Assert.Equal("UBICBTHDKQRB4LIYA6BMIJ7EA2G7YS7FIWMMVKZJE6M3HS5IVCOLKDY2", pk);
-//
-//     Console.WriteLine($"OK");
-// }
-//
-// internal static class Assert
-// {
-//     public static void Equal(string expected, string actual)
-//     {
-//         if (!string.Equals(expected, actual))
-//             throw new Exception($"Expected: {expected}, Actual: {actual}");
-//     }
-//
-//     public static void NotEmpty(string input)
-//     {
-//         if (string.IsNullOrEmpty(input))
-//             throw new Exception("Input is empty");
-//     }
-//
-//     public static void False(bool input)
-//     {
-//         if (input)
-//             throw new Exception("Input is true");
-//     }
-//
-//     public static void True(bool input)
-//     {
-//         if (!input)
-//             throw new Exception("Input is true");
-//     }
-//
-//     public static void NotNull(object value)
-//     {
-//         if (value == null)
-//             throw new Exception("Value is null");
-//     }
-// }
+static IEnumerable<(PrefixByte prefix, char initial)> GetPrefixData()
+{
+    yield return (PrefixByte.User, 'U');
+    yield return (PrefixByte.Account, 'A');
+    yield return (PrefixByte.Operator, 'O');
+    yield return (PrefixByte.Cluster, 'C');
+    yield return (PrefixByte.Server, 'N');
+}
+
+void Create_key_pair(PrefixByte prefix, char initial)
+{
+    Console.Write($"Create_key_pair ({prefix}, {initial}) ");
+
+    var pair = KeyPair.CreatePair(prefix);
+    Assert.NotNull(pair);
+    Assert.NotEmpty(pair.GetSeed());
+    Assert.NotEmpty(pair.GetPublicKey());
+    Assert.Equal(initial, pair.GetPublicKey()[0]);
+    Assert.Equal($"S{initial}", pair.GetSeed().Substring(0, 2));
+
+    var signature = new Memory<byte>(new byte[64]);
+    var message = new ReadOnlyMemory<byte>([1, 2]);
+    var corrupt = new ReadOnlyMemory<byte>([1, 2, 3]);
+    pair.Sign(message, signature);
+    Assert.True(pair.Verify(message, signature));
+    Assert.False(pair.Verify(corrupt, signature));
+
+    Console.WriteLine("[OK]");
+}
+
+void Create_seed_for_prefix(PrefixByte prefix, char initial)
+{
+    Console.Write($"Create_seed_for_prefix ({prefix}, {initial}) ");
+
+    var kp = KeyPair.CreatePair(prefix);
+    Assert.NotEmpty(kp.GetSeed());
+    Assert.False(kp.GetSeed().EndsWith("=", StringComparison.Ordinal));
+    Assert.Equal(initial, kp.GetPublicKey()[0]);
+
+    Console.WriteLine("[OK]");
+}
+
+void Api()
+{
+    Console.WriteLine("Api tests");
+
+    // Create a key pair
+    {
+        // Create a new key pair for a user
+        KeyPair keyPair = KeyPair.CreatePair(PrefixByte.User);
+
+        // Get the seed and public key
+        string seed = keyPair.GetSeed();
+        string publicKey = keyPair.GetPublicKey();
+
+        // Output example (your seed will be different):
+        // Seed: SUAOBFVHF4ZWKTBJ6QP4C362WLBBBFIE7ENFTPYKUGZ3M2ESOXY353LXDI
+        Console.WriteLine($"Seed: {seed}");
+
+        // Output example (your public key will be different):
+        // Public key: UBIWK4X3RXCPJ4CMIAVLAFDFABMLCCMZDDLAO5OZZ2265MDLXUTOGO4B
+        Console.WriteLine($"Public key: {publicKey}");
+    }
+
+    // Using generated seeds
+    {
+        // Using already generated seed and public key
+        var seed = "SOAELH6NJCEK4HST5644G4HK7TOAFZGRRJHNM4EUKUY7PPNDLIKO5IH4JM";
+        var publicKey = "ODPWIBQJVIQ42462QAFI2RKJC4RZHCQSIVPRDDHWFCJAP52NRZK6Z2YC";
+
+        // Create a key pair from seed
+        KeyPair pair1 = KeyPair.FromSeed(seed);
+        Assert.Equal(publicKey, pair1.GetPublicKey());
+
+        // Create a key pair from public key
+        KeyPair pair2 = KeyPair.FromPublicKey(publicKey);
+        Assert.Equal(publicKey, pair2.GetPublicKey());
+
+        // Sign and verify
+        var message = new ReadOnlyMemory<byte>([42, 43, 44]);
+        var signature = new Memory<byte>(new byte[64]);
+        pair1.Sign(message, signature);
+        Assert.True(pair2.Verify(message, signature));
+
+        // Verify fails with corrupt data
+        var corrupt = new ReadOnlyMemory<byte>([43, 44]);
+        Assert.False(pair2.Verify(corrupt, signature));
+    }
+
+    Console.WriteLine("[OK]");
+}
+
+void Public_key_from_seed()
+{
+    Console.Write($"Public_key_from_seed ");
+
+    // using nsc generated seeds for testing
+    var kp = KeyPair.FromSeed("SOAELH6NJCEK4HST5644G4HK7TOAFZGRRJHNM4EUKUY7PPNDLIKO5IH4JM".ToCharArray());
+    Assert.Equal("ODPWIBQJVIQ42462QAFI2RKJC4RZHCQSIVPRDDHWFCJAP52NRZK6Z2YC", kp.GetPublicKey());
+
+    kp = KeyPair.FromSeed("SAANWFZ3JINNPERWT3ALE45U7GYT2ZDW6GJUIVPDKUF6GKAX6AISZJMAS4".ToCharArray());
+    Assert.Equal("AATEJXG7UX4HFJ6ZPRTP22P6OYZER36YYD3GVBOVW7QHLU32P4QFFTZJ", kp.GetPublicKey());
+
+    kp = KeyPair.FromSeed("SUAGDLNBWI2SGHDRYBHD63NH5FGZSVJUW2J7GAJZXWANQFLDW6G5SXZESU".ToCharArray());
+    Assert.Equal("UBICBTHDKQRB4LIYA6BMIJ7EA2G7YS7FIWMMVKZJE6M3HS5IVCOLKDY2", kp.GetPublicKey());
+
+    Console.WriteLine("[OK]");
+}
+
+internal static class Assert
+{
+    public static void Equal(string expected, string actual)
+    {
+        if (!string.Equals(expected, actual))
+            throw new Exception($"Expected: {expected}, Actual: {actual}");
+    }
+
+    public static void Equal(char expected, char actual)
+    {
+        if (!Equals(expected, actual))
+            throw new Exception($"Expected: {expected}, Actual: {actual}");
+    }
+
+    public static void NotEmpty(string input)
+    {
+        if (string.IsNullOrEmpty(input))
+            throw new Exception("Input is empty");
+    }
+
+    public static void False(bool input)
+    {
+        if (input)
+            throw new Exception("Input is true");
+    }
+
+    public static void True(bool input)
+    {
+        if (!input)
+            throw new Exception("Input is true");
+    }
+
+    public static void NotNull(object value)
+    {
+        if (value == null)
+            throw new Exception("Value is null");
+    }
+}
