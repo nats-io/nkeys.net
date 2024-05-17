@@ -12,6 +12,7 @@ public class KeyPairBench
 {
     private byte[] _message = new byte[32];
     private string _seed = "SUAD4F52S2XAJTJ3TGDJ4VXQVW7TU35XJUSVKF25ZRXIWCIUK6NLANREBM";
+    private string _publicKey;
     private KeyPair _pair;
     private byte[] _pair1_pk;
     private byte[] _pair1_seed;
@@ -25,6 +26,7 @@ public class KeyPairBench
         random.NextBytes(_message);
 
         _pair = KeyPair.FromSeed(_seed);
+        _publicKey = _pair.GetPublicKey();
 
         _pair1_seed = NKeysReference1.NewSeed(new FixedRng());
         _pair1_pk = Ed25519.PublicKeyFromSeed(_pair1_seed);
@@ -72,4 +74,8 @@ public class KeyPairBench
     [Benchmark]
     public object FromSeedRef2()
         => NKeysUtilsReference2.FromSeed(_seed);
+
+    [Benchmark]
+    public object FromPublicKey()
+        => KeyPair.FromPublicKey(_publicKey);
 }

@@ -151,15 +151,17 @@ public class NKeysTest(ITestOutputHelper output)
         var publicKey = kp1.GetPublicKey();
         output.WriteLine($"seed={seed}");
 
-        var kp2 = KeyPair.FromSeed(seed);
+        var kp2 = KeyPair.FromSeed(seed.ToCharArray());
         Assert.Equal(kp1.GetPublicKey(), kp2.GetPublicKey());
+        output.WriteLine($"pk={kp1.GetPublicKey()}");
 
-        var kp3 = KeyPair.FromPublicKey(publicKey);
+        var kp3 = KeyPair.FromPublicKey(publicKey.ToCharArray());
         Assert.Equal(kp1.GetPublicKey(), kp3.GetPublicKey());
+        output.WriteLine($"pk={kp3.GetPublicKey()}");
 
         // test seed
         {
-            var kp = KeyPair.FromSeed("SOAELH6NJCEK4HST5644G4HK7TOAFZGRRJHNM4EUKUY7PPNDLIKO5IH4JM");
+            var kp = KeyPair.FromSeed("SOAELH6NJCEK4HST5644G4HK7TOAFZGRRJHNM4EUKUY7PPNDLIKO5IH4JM".ToCharArray());
             Assert.Equal("ODPWIBQJVIQ42462QAFI2RKJC4RZHCQSIVPRDDHWFCJAP52NRZK6Z2YC", kp.GetPublicKey());
         }
     }

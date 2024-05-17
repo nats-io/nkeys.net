@@ -2,6 +2,9 @@ using NATS.NKeys.Internal;
 
 namespace NATS.NKeys;
 
+/// <summary>
+/// Lists the prefix bytes used in the NATS NKeys library.
+/// </summary>
 public enum PrefixByte : byte
 {
     /// <summary>

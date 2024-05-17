@@ -2,12 +2,22 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable SuggestVarOrType_BuiltInTypes
 
+using System;
 using System.Runtime.CompilerServices;
 
 namespace NATS.NKeys;
 
+/// <summary>
+/// Base32 encoding and decoding.
+/// </summary>
 public static class Base32
 {
+    /// <summary>
+    /// Decodes a Base32-encoded string into a byte array.
+    /// </summary>
+    /// <param name="encoded">The Base32-encoded string to decode.</param>
+    /// <param name="result">The byte array to store the decoded data.</param>
+    /// <returns>The number of bytes decoded.</returns>
     public static int FromBase32(ReadOnlySpan<char> encoded, Span<byte> result)
     {
         var currentByte = 0;
@@ -37,6 +47,12 @@ public static class Base32
         return outputLength;
     }
 
+    /// <summary>
+    /// Converts a byte array to a Base32-encoded string.
+    /// </summary>
+    /// <param name="data">The byte array to encode.</param>
+    /// <param name="output">The span of characters to store the encoded data.</param>
+    /// <returns>The number of characters encoded.</returns>
     public static int ToBase32(ReadOnlySpan<byte> data, Span<char> output)
     {
         var outputLen = GetEncodedLength(data);
@@ -70,6 +86,11 @@ public static class Base32
         return outputIndex;
     }
 
+    /// <summary>
+    /// Calculates the length of the decoded data from a Base32-encoded string.
+    /// </summary>
+    /// <param name="encoded">The Base32-encoded string.</param>
+    /// <returns>The length of the decoded data.</returns>
     public static int GetDataLength(ReadOnlySpan<char> encoded)
     {
         var length = 0;
@@ -84,6 +105,11 @@ public static class Base32
         return length * 5 / 8;
     }
 
+    /// <summary>
+    /// Calculates the length of the Base32 encoding for a given byte array.
+    /// </summary>
+    /// <param name="data">The byte array to calculate the encoding length for.</param>
+    /// <returns>The length of the Base32 encoding.</returns>
     public static int GetEncodedLength(ReadOnlySpan<byte> data)
     {
         var bitsCount = data.Length * 8;
