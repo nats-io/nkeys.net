@@ -4,8 +4,8 @@ NATS.NKeys.KeyPair
 NATS.NKeys.KeyPair.Dispose() -> void
 NATS.NKeys.KeyPair.GetPublicKey() -> string!
 NATS.NKeys.KeyPair.GetSeed() -> string!
-NATS.NKeys.KeyPair.Sign(in System.ReadOnlyMemory<byte> message, System.Memory<byte> signature) -> void
-NATS.NKeys.KeyPair.Verify(in System.ReadOnlyMemory<byte> message, in System.ReadOnlyMemory<byte> signature) -> bool
+NATS.NKeys.KeyPair.Sign(System.ReadOnlyMemory<byte> message, System.Memory<byte> signature) -> void
+NATS.NKeys.KeyPair.Verify(System.ReadOnlyMemory<byte> message, System.ReadOnlyMemory<byte> signature) -> bool
 NATS.NKeys.PrefixByte
 NATS.NKeys.PrefixByte.Account = 0 -> NATS.NKeys.PrefixByte
 NATS.NKeys.PrefixByte.Cluster = 16 -> NATS.NKeys.PrefixByte

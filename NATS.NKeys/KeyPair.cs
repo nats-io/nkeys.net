@@ -116,7 +116,7 @@ public sealed class KeyPair : IDisposable
     /// <param name="message">The message to be signed.</param>
     /// <param name="signature">The memory to store the signature.</param>
     /// <exception cref="NKeysException">Thrown if the private key is not valid or there is an error during the signing process.</exception>
-    public void Sign(in ReadOnlyMemory<byte> message, Memory<byte> signature)
+    public void Sign(ReadOnlyMemory<byte> message, Memory<byte> signature)
     {
         if (!MemoryMarshal.TryGetArray(message, out var inputArray))
             ThrowCouldNotGetArrayException(nameof(message));
@@ -137,7 +137,7 @@ public sealed class KeyPair : IDisposable
     /// <c>true</c> if the message is authentic and the signature is valid;
     /// otherwise, <c>false</c>.
     /// </returns>
-    public bool Verify(in ReadOnlyMemory<byte> message, in ReadOnlyMemory<byte> signature)
+    public bool Verify(ReadOnlyMemory<byte> message, ReadOnlyMemory<byte> signature)
     {
         if (!MemoryMarshal.TryGetArray(message, out var messageArray))
             ThrowCouldNotGetArrayException(nameof(message));
