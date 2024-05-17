@@ -1,0 +1,78 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NATS.NKeys", "NATS.NKeys\NATS.NKeys.csproj", "{9CF80924-AA2F-4AC1-B11A-B3B281E90731}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NATS.NKeys.Tests", "NATS.NKeys.Tests\NATS.NKeys.Tests.csproj", "{2BF2E0B0-23E0-442C-BE2B-2CE820DF6A0F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".", ".", "{67B70F86-B055-4C21-8A79-FC577F6869E0}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+		LICENSE = LICENSE
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		Directory.Build.props = Directory.Build.props
+		Icon.png = Icon.png
+		version.txt = version.txt
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NATS.NKeys.NaCl.Tests", "NATS.NKeys.NaCl.Tests\NATS.NKeys.NaCl.Tests.csproj", "{3A58BAD0-7702-4C16-BF35-C808A4644348}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{6A64D5FF-ED5C-427E-92E9-486354041BCD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ISSUE_TEMPLATE", "ISSUE_TEMPLATE", "{27BEA938-4123-4AE8-8640-EFF320918101}"
+	ProjectSection(SolutionItems) = preProject
+		.github\ISSUE_TEMPLATE\config.yml = .github\ISSUE_TEMPLATE\config.yml
+		.github\ISSUE_TEMPLATE\defect.yml = .github\ISSUE_TEMPLATE\defect.yml
+		.github\ISSUE_TEMPLATE\proposal.yml = .github\ISSUE_TEMPLATE\proposal.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{B163496C-156D-4ACD-B6A0-040354F96305}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\format.yml = .github\workflows\format.yml
+		.github\workflows\test.yml = .github\workflows\test.yml
+		.github\workflows\release.yml = .github\workflows\release.yml
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NATS.NKeys.CheckNativeAot", "NATS.NKeys.CheckNativeAot\NATS.NKeys.CheckNativeAot.csproj", "{7EA94493-DAC4-4052-AA20-771079D131AC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NATS.NKeys.Benchmarks", "NATS.NKeys.Benchmarks\NATS.NKeys.Benchmarks.csproj", "{3D66B7B0-2CA9-4A3E-93CE-6AD0F3EA1F9D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9CF80924-AA2F-4AC1-B11A-B3B281E90731}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CF80924-AA2F-4AC1-B11A-B3B281E90731}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CF80924-AA2F-4AC1-B11A-B3B281E90731}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CF80924-AA2F-4AC1-B11A-B3B281E90731}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2BF2E0B0-23E0-442C-BE2B-2CE820DF6A0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2BF2E0B0-23E0-442C-BE2B-2CE820DF6A0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2BF2E0B0-23E0-442C-BE2B-2CE820DF6A0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2BF2E0B0-23E0-442C-BE2B-2CE820DF6A0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A58BAD0-7702-4C16-BF35-C808A4644348}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A58BAD0-7702-4C16-BF35-C808A4644348}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A58BAD0-7702-4C16-BF35-C808A4644348}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A58BAD0-7702-4C16-BF35-C808A4644348}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7EA94493-DAC4-4052-AA20-771079D131AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7EA94493-DAC4-4052-AA20-771079D131AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7EA94493-DAC4-4052-AA20-771079D131AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7EA94493-DAC4-4052-AA20-771079D131AC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D66B7B0-2CA9-4A3E-93CE-6AD0F3EA1F9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D66B7B0-2CA9-4A3E-93CE-6AD0F3EA1F9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D66B7B0-2CA9-4A3E-93CE-6AD0F3EA1F9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D66B7B0-2CA9-4A3E-93CE-6AD0F3EA1F9D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{27BEA938-4123-4AE8-8640-EFF320918101} = {6A64D5FF-ED5C-427E-92E9-486354041BCD}
+		{B163496C-156D-4ACD-B6A0-040354F96305} = {6A64D5FF-ED5C-427E-92E9-486354041BCD}
+	EndGlobalSection
+EndGlobal
