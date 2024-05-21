@@ -1,7 +1,3 @@
-# UNDER DEVELOPMENT :warning:
-
-**IMPORTANT**: Under development at the moment, not ready for use.
-
 # NKeys .NET
 
 [![Build and Test](https://github.com/nats-io/nkeys.net/actions/workflows/test.yml/badge.svg)](https://github.com/nats-io/nkeys.net/actions/workflows/test.yml)
