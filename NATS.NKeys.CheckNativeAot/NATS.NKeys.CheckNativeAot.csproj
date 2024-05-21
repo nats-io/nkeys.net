@@ -6,7 +6,6 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <PublishAot>true</PublishAot>
-        <IsPackable>false</IsPackable>
         <TrimmerSingleWarn>false</TrimmerSingleWarn>
     </PropertyGroup>
 
