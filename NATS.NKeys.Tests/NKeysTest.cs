@@ -20,6 +20,25 @@ public class NKeysTest(ITestOutputHelper output)
         }
     }
 
+    [Fact]
+    public void XKey_from_seed()
+    {
+        var kp = KeyPair.FromSeed("SXALBV3GJABONHXVSTRWL2NXYVUF5LY66CGVF4INX2XBMMVYT2KCZXRXWA".ToCharArray());
+        Assert.Equal("XBKXUQXILUXDDHTWEDECINN24IUYFQAYG737MB5PMEAVMUMHCIWRA3UD", kp.GetPublicKey());
+        var exception = Assert.Throws<NKeysException>(() => kp.Sign(default, default));
+        Assert.Equal("Invalid curve key operation", exception.Message);
+    }
+
+    [Fact]
+    public void XKey_create()
+    {
+        var kp = KeyPair.CreatePair(PrefixByte.Curve, new FixedRng());
+        Assert.Equal("SXAD4F52S2XAJTJ3TGDJ4VXQVW7TU35XJUSVKF25ZRXIWCIUK6NLANRHVY", kp.GetSeed());
+        Assert.Equal("XDS6PE7IMMUA7XXUZLWQIPUCRS3J2IGXVMI3ZEOWX7LY4IMBPH2XECZM", kp.GetPublicKey());
+        var exception = Assert.Throws<NKeysException>(() => kp.Sign(default, default));
+        Assert.Equal("Invalid curve key operation", exception.Message);
+    }
+
     [MemberData(nameof(PrefixData))]
     [Theory]
     public void Create_key_pair(PrefixByte prefix, char initial)

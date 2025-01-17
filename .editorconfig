@@ -8,7 +8,10 @@ trim_trailing_whitespace = true
 insert_final_newline = true
 end_of_line = lf
 
-[src/NATS.Client.Core/NaCl/**.cs]
+[NATS.NKeys/NaCl/**.cs]
+generated_code = true
+
+[NATS.NKeys/X25519/**.cs]
 generated_code = true
 
 [*.cs]

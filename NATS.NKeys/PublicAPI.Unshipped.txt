@@ -11,6 +11,7 @@ NATS.NKeys.NKeysException.NKeysException(string! message) -> void
 NATS.NKeys.PrefixByte
 NATS.NKeys.PrefixByte.Account = 0 -> NATS.NKeys.PrefixByte
 NATS.NKeys.PrefixByte.Cluster = 16 -> NATS.NKeys.PrefixByte
+NATS.NKeys.PrefixByte.Curve = 184 -> NATS.NKeys.PrefixByte
 NATS.NKeys.PrefixByte.Operator = 112 -> NATS.NKeys.PrefixByte
 NATS.NKeys.PrefixByte.Server = 104 -> NATS.NKeys.PrefixByte
 NATS.NKeys.PrefixByte.User = 160 -> NATS.NKeys.PrefixByte
