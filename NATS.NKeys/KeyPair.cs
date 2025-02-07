@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using NATS.NKeys.Internal;
 using NATS.NKeys.NaCl;
+using X25519;
 
 namespace NATS.NKeys;
 
@@ -63,7 +64,17 @@ public sealed class KeyPair : IDisposable
         var sk = new ArraySegment<byte>(new byte[64]);
 
         seedSpan.CopyTo(seed.Array);
-        Ed25519.KeyPairFromSeed(pk, sk, seed);
+
+        if (type == PrefixByte.Curve)
+        {
+            var publicKey = Curve25519.ScalarMultiplication(seed.Array, Curve25519.Basepoint);
+            publicKey.AsSpan().CopyTo(pk.Array);
+        }
+        else
+        {
+            Ed25519.KeyPairFromSeed(pk, sk, seed);
+        }
+
         return new KeyPair(type, seed.Array!, sk.Array!, pk.Array!);
     }
 
@@ -93,7 +104,15 @@ public sealed class KeyPair : IDisposable
         var seed = new byte[32];
         rng.GetBytes(seed);
         var sk = Ed25519.ExpandedPrivateKeyFromSeed(seed);
-        var pk = Ed25519.PublicKeyFromSeed(seed);
+        byte[] pk;
+        if (prefix == PrefixByte.Curve)
+        {
+            pk = Curve25519.ScalarMultiplication(seed, Curve25519.Basepoint);
+        }
+        else
+        {
+            pk = Ed25519.PublicKeyFromSeed(seed);
+        }
 
         return new KeyPair(prefix, seed, sk, pk);
     }
@@ -124,6 +143,9 @@ public sealed class KeyPair : IDisposable
     /// <exception cref="NKeysException">Thrown if the private key is not valid or there is an error during the signing process.</exception>
     public void Sign(ReadOnlyMemory<byte> message, Memory<byte> signature)
     {
+        if (_type == PrefixByte.Curve)
+            ThrowInvalidCurveKeyOperationException();
+
         if (_sk.Length == 0)
             ThrowNoSecretKeyException();
 
@@ -272,6 +294,8 @@ public sealed class KeyPair : IDisposable
             return PrefixByte.Account;
         case NKeysConstants.PrefixByteUser:
             return PrefixByte.User;
+        case NKeysConstants.PrefixByteCurve:
+            return PrefixByte.Curve;
         }
 
         return null;
@@ -308,4 +332,7 @@ public sealed class KeyPair : IDisposable
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void ThrowNoSecretKeyException() => throw new NKeysException("No secret key");
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void ThrowInvalidCurveKeyOperationException() => throw new NKeysException("Invalid curve key operation");
 }

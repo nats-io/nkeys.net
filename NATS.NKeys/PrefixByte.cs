@@ -36,4 +36,10 @@ public enum PrefixByte : byte
     /// </summary>
     /// <remarks>When encoded as base32, it encodes to 'U...'</remarks>
     User = NKeysConstants.PrefixByteUser,
+
+    /// <summary>
+    /// The version byte used for encoded CurveKeys (X25519).
+    /// </summary>
+    /// <remarks>When encoded as base32, it encodes to 'X...'</remarks>
+    Curve = NKeysConstants.PrefixByteCurve,
 }
