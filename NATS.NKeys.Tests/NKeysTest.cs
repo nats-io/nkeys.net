@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using NATS.NKeys.Benchmarks;
 using Xunit;
 using Xunit.Abstractions;
@@ -27,6 +28,43 @@ public class NKeysTest(ITestOutputHelper output)
         Assert.Equal("XBKXUQXILUXDDHTWEDECINN24IUYFQAYG737MB5PMEAVMUMHCIWRA3UD", kp.GetPublicKey());
         var exception = Assert.Throws<NKeysException>(() => kp.Sign(default, default));
         Assert.Equal("Invalid curve key operation", exception.Message);
+    }
+
+    [Fact]
+    public void XKey_seal_open()
+    {
+        var kp1 = KeyPair.FromSeed("SXAD4F52S2XAJTJ3TGDJ4VXQVW7TU35XJUSVKF25ZRXIWCIUK6NLANRHVY".ToCharArray());
+        var pk1 = kp1.GetPublicKey();
+        output.WriteLine($"pk1: {pk1}");
+
+        var kp2 = KeyPair.FromSeed("SXAAPCLFDKJ3FOGPXVS5OT3ZRYT5CZHVRRJUEZKHHJNFQQI5IURJ3IN3OU".ToCharArray());
+        var pk2 = kp2.GetPublicKey();
+        output.WriteLine($"pk2: {pk2}");
+
+        var seal = kp1.Seal(Encoding.UTF8.GetBytes("hello"), pk2);
+
+        var seal64 = Convert.ToBase64String(seal);
+        output.WriteLine($"seal64: {seal64}");
+
+        foreach (var sealed64Text in new[]
+                 {
+                     seal64,
+
+                     // generated using nkeys Go library:
+                     "eGt2MchZLvgdJ5IKV4ZD/pAHnpwGMw2D2j7eA/vjRBhZzWmQAvbTzMTu8M1aevP4Gg==",
+                     "eGt2MRpP/wq2ckUO5PMs8ao4EB2Vrb6uMdxspLnxsqQXT7HUoYk/WdhK49WVVbK70w==",
+                     "eGt2MZ0ka1T50jsi8YcP/xYRW+gG/Cg0Mufkmlo7bpOHrCHEvkOmaRcIJ6xzpFtqww==",
+                     "eGt2MUNXS9+hvSaH5uTWJ5xpDNJuGCfBUxTKm4BD9OdoPkYNEiv9mr63dUZTjcdmNQ==",
+                     "eGt2MUNTNs7wYhKx9wJ+k/YXOAEhbrqHsRQXZpMb5WXtMqFxkDj7S1iRSCJme0Eubg==",
+                     "eGt2Mekw7+a2WRuMxGVtRU7dAEg0iYqTtRiei0w+nUXwdKbWgtkCgJV4rlMXJycL+Q==",
+                     "eGt2MSpwx9uW1pbYUFGPdfQ45sASe/mvUtSfXidTi92tr6YXzaq2dHnE5xr2qLDxuw==",
+                 })
+        {
+            var open = kp2.Open(Convert.FromBase64String(sealed64Text), pk1);
+            var text = Encoding.UTF8.GetString(open);
+            Assert.Equal("hello", text);
+            output.WriteLine($"open: {text}");
+        }
     }
 
     [Fact]
@@ -109,8 +147,8 @@ public class NKeysTest(ITestOutputHelper output)
     public void Public_key_from_seed()
     {
         // using nsc generated seeds for testing
-        var kp = KeyPair.FromSeed("SOAELH6NJCEK4HST5644G4HK7TOAFZGRRJHNM4EUKUY7PPNDLIKO5IH4JM".ToCharArray());
-        Assert.Equal("ODPWIBQJVIQ42462QAFI2RKJC4RZHCQSIVPRDDHWFCJAP52NRZK6Z2YC", kp.GetPublicKey());
+        var kp = KeyPair.FromSeed("SUAAVWRZG6M5FA5VRRGWSCIHKTOJC7EWNIT4JV3FTOIPO4OBFR5WA7X5TE".ToCharArray());
+        Assert.Equal("UALQSMXRSAA7ZXIGDDJBJ2JOYJVQIWM3LQVDM5KYIPG4EP3FAGJ47BOJ", kp.GetPublicKey());
 
         kp = KeyPair.FromSeed("SAANWFZ3JINNPERWT3ALE45U7GYT2ZDW6GJUIVPDKUF6GKAX6AISZJMAS4".ToCharArray());
         Assert.Equal("AATEJXG7UX4HFJ6ZPRTP22P6OYZER36YYD3GVBOVW7QHLU32P4QFFTZJ", kp.GetPublicKey());
