@@ -16,6 +16,13 @@ namespace NATS.NKeys;
 /// </summary>
 public sealed class KeyPair : IDisposable
 {
+    private const int CurveKeyLen = 32;
+    private const int CurveDecodeLen = 35;
+    private const int CurveNonceLen = 24;
+    private const string XKeyVersionV1 = "xkv1";
+    private static readonly byte[] XKeyVersionV1Bytes = Encoding.ASCII.GetBytes(XKeyVersionV1);
+    private static readonly int Vlen = XKeyVersionV1.Length;
+
     private readonly PrefixByte _type;
     private readonly byte[] _seed;
     private readonly byte[] _sk;
@@ -46,7 +53,7 @@ public sealed class KeyPair : IDisposable
             throw new NKeysException("Not a valid public NKey");
         }
 
-        return new KeyPair(prefixByte.Value, [], [], buffer.Slice(1, len - 1).ToArray());
+        return new KeyPair(prefixByte.Value, Array.Empty<byte>(), Array.Empty<byte>(), buffer.Slice(1, len - 1).ToArray());
     }
 
     /// <summary>
@@ -69,7 +76,7 @@ public sealed class KeyPair : IDisposable
 
         if (type == PrefixByte.Curve)
         {
-            var publicKey = Curve25519.ScalarMultiplication(seed.Array!, Curve25519.Basepoint);
+            var publicKey = Curve25519.ScalarMultiplication(seed.Array, Curve25519.Basepoint);
             publicKey.AsSpan().CopyTo(pk.Array);
         }
         else
@@ -399,14 +406,6 @@ public sealed class KeyPair : IDisposable
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void ThrowInvalidCurveKeyOperationException() => throw new NKeysException("Invalid curve key operation");
 
-#pragma warning disable
-    const int curveKeyLen = 32;
-    const int curveDecodeLen = 35;
-    private const int CurveNonceLen = 24;
-    private const string XKeyVersionV1 = "xkv1";
-    private static readonly byte[] XKeyVersionV1Bytes = Encoding.ASCII.GetBytes(XKeyVersionV1);
-    private static readonly int Vlen = XKeyVersionV1.Length;
-
     private static byte[] DecodePubCurveKey(string key)
     {
         // TODO optimize
@@ -414,7 +413,7 @@ public sealed class KeyPair : IDisposable
         var buf = new Span<byte>(new byte[length]);
         Base32.FromBase32(key.ToCharArray(), buf);
 
-        if (buf.Length != curveDecodeLen)
+        if (buf.Length != CurveDecodeLen)
         {
             throw new NKeysException("Not a valid curve key");
         }
@@ -429,5 +428,4 @@ public sealed class KeyPair : IDisposable
 
         return pub;
     }
-#pragma warning restore
 }
