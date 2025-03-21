@@ -198,6 +198,11 @@ public sealed class KeyPair : IDisposable
     /// <exception cref="NKeysException">Thrown if the receiver's public key is invalid.</exception>
     public byte[] Seal(byte[] data, string receiver)
     {
+        if (_type != PrefixByte.Curve)
+        {
+            throw new NKeysException("Curve key only operation");
+        }
+
         // TODO optimize
         var rpub = DecodePubCurveKey(receiver);
 
@@ -230,6 +235,11 @@ public sealed class KeyPair : IDisposable
     /// <exception cref="NKeysException">Thrown if the input data is invalid or decryption fails.</exception>
     public byte[] Open(byte[] input, string sender)
     {
+        if (_type != PrefixByte.Curve)
+        {
+            throw new NKeysException("Curve key only operation");
+        }
+
         // TODO optimize
         if (input.Length <= Vlen + CurveNonceLen)
         {
