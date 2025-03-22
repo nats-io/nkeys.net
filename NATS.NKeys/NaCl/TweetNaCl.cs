@@ -52,9 +52,31 @@ internal class TweetNaCl
     public static readonly Int32 SignBytes = 64;
 
 
-    public class InvalidSignatureException : CryptographicException { }
-    public class InvalidCipherTextException : CryptographicException { }
-    public class InvalidEncryptionKeypair : CryptographicException { }
+    public class InvalidSignatureException : NKeyNaclException
+    {
+        public InvalidSignatureException(string msg) : base(msg)
+        {
+        }
+    }
+
+    public class InvalidCipherTextException : NKeyNaclException
+    {
+        public InvalidCipherTextException(string msg) : base(msg)
+        {
+        }
+    }
+
+    public class InvalidEncryptionKeypair : NKeyNaclException
+    {
+        public InvalidEncryptionKeypair(string msg) : base(msg)
+        {
+        }
+    }
+
+    public class NKeyNaclException : Exception
+    {
+        public NKeyNaclException(string msg) : base(msg) { }
+    }
 
     /// <summary>
     /// Scalar multiplication is a curve25519 implementation.
@@ -246,7 +268,7 @@ internal class TweetNaCl
 
         if (CryptoHash(d, secretKey, 32) != 0)
         {
-            throw new InvalidSignatureException();
+            throw new InvalidSignatureException("hash error");
         }
 
         d[0] &= 248;
@@ -358,12 +380,12 @@ internal class TweetNaCl
 
         if (signedMessage.Length < 64)
         {
-            throw new InvalidSignatureException();
+            throw new InvalidSignatureException("signed message length is less than 64");
         }
 
         if (Unpackneg(q, publicKey) != 0)
         {
-            throw new InvalidSignatureException();
+            throw new InvalidSignatureException("unpack error");
         }
 
         for (var i = 0; i < signedMessage.Length; ++i)
@@ -391,7 +413,7 @@ internal class TweetNaCl
                 tsm[i] = 0;
             }
 
-            throw new InvalidSignatureException();
+            throw new InvalidSignatureException("verification error");
         }
 
         for (var i = 0; i < signedMessage.Length - 64; ++i)
@@ -1191,12 +1213,12 @@ internal class TweetNaCl
 
         if (ciphered.Length == 0)
         {
-            throw new InvalidCipherTextException();
+            throw new InvalidCipherTextException("ciphertext is empty");
         }
 
         if (CryptoOnetimeAuth(ciphered, 16, ciphered, 32, paddedMessage.Length - 32, ciphered) != 0)
         {
-            throw new InvalidCipherTextException();
+            throw new InvalidCipherTextException("ciphertext is incorrect");
         }
 
         for (var i = 0; i < BoxBoxZeroBytes; ++i)
@@ -1227,19 +1249,19 @@ internal class TweetNaCl
 
         if (boxCipheredMessage.Length < BoxZeroBytes)
         {
-            throw new InvalidCipherTextException();
+            throw new InvalidCipherTextException("box size is less than zero");
         }
 
         var nonceKey = CryptoStream(x, 32, nonce, secretKey);
 
         if (nonceKey.Length == 0)
         {
-            throw new InvalidCipherTextException();
+            throw new InvalidCipherTextException("nonce is empty");
         }
 
         if (CryptoOnetimeauthVerify(boxCipheredMessage, BoxBoxZeroBytes, boxCipheredMessage, BoxZeroBytes, boxCipheredMessage.Length - BoxZeroBytes, nonceKey) != 0)
         {
-            throw new InvalidCipherTextException();
+            throw new InvalidCipherTextException("ciphertext is incorrect");
         }
 
         var decMessage = CryptoStreamXor(boxCipheredMessage, nonce, secretKey);
