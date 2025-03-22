@@ -61,7 +61,8 @@ public class NKeysTest(ITestOutputHelper output)
             var text2 = Convert.ToBase64String(open2);
             Assert.Equal(text1, text2);
 
-            // Seal and open using this implementation
+            // Double check seal since we can't compare sealed data since
+            // it'd be different every time because of nonce
             var seal = kp1.Seal(Convert.FromBase64String(text1), pk2);
             var open3 = kp2.Open(seal, pk1);
             var text3 = Convert.ToBase64String(open3);
