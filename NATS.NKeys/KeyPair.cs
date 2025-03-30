@@ -3,6 +3,8 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
+using System.Text;
+using NaCl;
 using NATS.NKeys.Internal;
 using NATS.NKeys.NaCl;
 using X25519;
@@ -14,6 +16,13 @@ namespace NATS.NKeys;
 /// </summary>
 public sealed class KeyPair : IDisposable
 {
+    private const int CurveKeyLen = 32;
+    private const int CurveDecodeLen = 35;
+    private const int CurveNonceLen = 24;
+    private const string XKeyVersionV1 = "xkv1";
+    private static readonly byte[] XKeyVersionV1Bytes = Encoding.ASCII.GetBytes(XKeyVersionV1);
+    private static readonly int Vlen = XKeyVersionV1.Length;
+
     private readonly PrefixByte _type;
     private readonly byte[] _seed;
     private readonly byte[] _sk;
@@ -180,6 +189,77 @@ public sealed class KeyPair : IDisposable
     }
 
     /// <summary>
+    /// Encrypts a data payload for a specified receiver using public-key cryptography.
+    /// </summary>
+    /// <param name="data">The data to be encrypted.</param>
+    /// <param name="receiver">The public key of the receiver to encrypt the data for.</param>
+    /// <returns>A byte array containing the sealed encrypted message including necessary metadata.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when either the data or receiver is null.</exception>
+    /// <exception cref="NKeysException">Thrown if the receiver's public key is invalid.</exception>
+    public byte[] Seal(byte[] data, string receiver)
+    {
+        if (_type != PrefixByte.Curve)
+        {
+            throw new NKeysException("Curve key only operation");
+        }
+
+        // TODO optimize
+        var rpub = DecodePubCurveKey(receiver);
+
+        var nonce = new byte[CurveNonceLen];
+        using (var rng = RandomNumberGenerator.Create())
+        {
+            rng.GetBytes(nonce);
+        }
+
+        var @out = new byte[Vlen + CurveNonceLen];
+
+        Array.Copy(XKeyVersionV1Bytes, 0, @out, 0, Vlen);
+        Array.Copy(nonce, 0, @out, Vlen, CurveNonceLen);
+
+        var box = TweetNaCl.CryptoBox(data, nonce, rpub, _seed);
+
+        var ret = new byte[@out.Length + box.Length];
+        Array.Copy(@out, 0, ret, 0, @out.Length);
+        Array.Copy(box, 0, ret, @out.Length, box.Length);
+
+        return ret;
+    }
+
+    /// <summary>
+    /// Decrypts encrypted data using the sender's public key and the current instance's private key.
+    /// </summary>
+    /// <param name="input">The encrypted data to decrypt.</param>
+    /// <param name="sender">The sender's public key used for encryption.</param>
+    /// <returns>The decrypted byte array of the original data.</returns>
+    /// <exception cref="NKeysException">Thrown if the input data is invalid or decryption fails.</exception>
+    public byte[] Open(byte[] input, string sender)
+    {
+        if (_type != PrefixByte.Curve)
+        {
+            throw new NKeysException("Curve key only operation");
+        }
+
+        // TODO optimize
+        if (input.Length <= Vlen + CurveNonceLen)
+        {
+            throw new NKeysException("Encrypted input is not valid");
+        }
+
+        var nonce = new byte[CurveNonceLen];
+
+        if (!input.AsSpan().Slice(0, Vlen).SequenceEqual(XKeyVersionV1Bytes))
+        {
+            throw new NKeysException("Encrypted input is not valid");
+        }
+
+        Array.Copy(input, Vlen, nonce, 0, CurveNonceLen);
+        var spub = DecodePubCurveKey(sender);
+
+        return TweetNaCl.CryptoBoxOpen(input.AsSpan().Slice(Vlen + CurveNonceLen).ToArray(), nonce, spub, _seed)!;
+    }
+
+    /// <summary>
     /// Disposes the KeyPair object, wiping the sensitive data.
     /// </summary>
     /// <remarks>
@@ -335,4 +415,27 @@ public sealed class KeyPair : IDisposable
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void ThrowInvalidCurveKeyOperationException() => throw new NKeysException("Invalid curve key operation");
+
+    private static byte[] DecodePubCurveKey(string key)
+    {
+        // TODO optimize
+        var length = Base32.GetDataLength(key.ToCharArray());
+        var buf = new Span<byte>(new byte[length]);
+        Base32.FromBase32(key.ToCharArray(), buf);
+
+        if (buf.Length != CurveDecodeLen)
+        {
+            throw new NKeysException("Not a valid curve key");
+        }
+
+        var crc = (ushort)(buf[length - 2] | buf[length - 1] << 8);
+        if (crc != Crc16.Checksum(buf.Slice(0, length - 2)))
+        {
+            ThrowInvalidCrcException();
+        }
+
+        var pub = buf.Slice(1, length - 2).ToArray();
+
+        return pub;
+    }
 }

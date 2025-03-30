@@ -4,6 +4,8 @@ NATS.NKeys.KeyPair
 NATS.NKeys.KeyPair.Dispose() -> void
 NATS.NKeys.KeyPair.GetPublicKey() -> string!
 NATS.NKeys.KeyPair.GetSeed() -> string!
+NATS.NKeys.KeyPair.Open(byte[]! input, string! sender) -> byte[]!
+NATS.NKeys.KeyPair.Seal(byte[]! data, string! receiver) -> byte[]!
 NATS.NKeys.KeyPair.Sign(System.ReadOnlyMemory<byte> message, System.Memory<byte> signature) -> void
 NATS.NKeys.KeyPair.Verify(System.ReadOnlyMemory<byte> message, System.ReadOnlyMemory<byte> signature) -> bool
 NATS.NKeys.NKeysException

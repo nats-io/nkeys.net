@@ -386,7 +386,7 @@ internal class NKeysReference2Base32
 {
     public static byte[] Decode(ReadOnlySpan<char> input)
     {
-        if (input == null || input.Length == 0)
+        if (input.IsEmpty)
         {
             throw new ArgumentNullException(nameof(input));
         }

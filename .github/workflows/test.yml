@@ -27,12 +27,30 @@ jobs:
           dotnet-version: |
               6.x
               8.x
+              9.x
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+            go-version: '1.x'
+
+      - name: Generate Go Test Data
+        run: |
+            go get -u all
+            go mod tidy
+            go run main.go > NATS.NKeys.Tests/test_data.json
 
       - name: Build
         run: dotnet build -c Debug
 
       - name: Test Core
         run: dotnet test -c Debug --no-build --logger:"console;verbosity=normal"
+
+      - name: Test Compare Go Impl
+        run: |
+            cd nkTestGen
+            dotnet run > test_data.json
+            go test
 
       - name: Check Native AOT
         shell: bash
