@@ -37,6 +37,34 @@ public sealed class KeyPair : IDisposable
     }
 
     /// <summary>
+    /// Gets the type of the key as a <see cref="PrefixByte"/> enumeration value.
+    /// </summary>
+    /// <remarks>
+    /// The prefix indicates the role or purpose of the key, such as Operator, Server, Cluster, Account, User, or Curve.
+    /// </remarks>
+    public PrefixByte Prefix => _type;
+
+    /// <summary>
+    /// Validates if a given public key matches the provided prefix type.
+    /// </summary>
+    /// <param name="prefix">The expected prefix type to validate against.</param>
+    /// <param name="publicKey">The public key to validate.</param>
+    /// <returns><c>true</c> if the public key matches the specified prefix; otherwise, <c>false</c>.</returns>
+    /// <exception cref="NKeysException">Thrown if the public key is not a valid NKey or cannot be decoded.</exception>
+    public static bool IsValidPublicKey(PrefixByte prefix, ReadOnlySpan<char> publicKey)
+    {
+        Span<byte> buffer = stackalloc byte[64];
+        Decode(publicKey, buffer);
+        var prefixByte = TypeFromPrefix(buffer[0]);
+        if (!prefixByte.HasValue)
+        {
+            throw new NKeysException("Not a valid public NKey");
+        }
+
+        return prefixByte.Value == prefix;
+    }
+
+    /// <summary>
     /// Creates a <see cref="KeyPair"/> object from a public key.
     /// </summary>
     /// <param name="publicKey">The public key to create the <see cref="KeyPair"/> object from.</param>
@@ -76,7 +104,7 @@ public sealed class KeyPair : IDisposable
 
         if (type == PrefixByte.Curve)
         {
-            var publicKey = Curve25519.ScalarMultiplication(seed.Array, Curve25519.Basepoint);
+            var publicKey = Curve25519.ScalarMultiplication(seed.Array!, Curve25519.Basepoint);
             publicKey.AsSpan().CopyTo(pk.Array);
         }
         else
