@@ -217,8 +217,8 @@ public class NKeysTest(ITestOutputHelper output)
         output.WriteLine($"pk={kp3.GetPublicKey()}");
 
         // Using generated seeds
-        var encodedSeed = "SOAELH6NJCEK4HST5644G4HK7TOAFZGRRJHNM4EUKUY7PPNDLIKO5IH4JM".ToCharArray();
-        var encodedPublicKey = "ODPWIBQJVIQ42462QAFI2RKJC4RZHCQSIVPRDDHWFCJAP52NRZK6Z2YC".ToCharArray();
+        var encodedSeed = "SOAELH6NJCEK4HST5644G4HK7TOAFZGRRJHNM4EUKUY7PPNDLIKO5IH4JM";
+        var encodedPublicKey = "ODPWIBQJVIQ42462QAFI2RKJC4RZHCQSIVPRDDHWFCJAP52NRZK6Z2YC";
 
         var kp4 = KeyPair.FromSeed(encodedSeed);
         Assert.Equal(encodedPublicKey, kp4.GetPublicKey());
@@ -239,7 +239,7 @@ public class NKeysTest(ITestOutputHelper output)
     [Fact]
     public void Public_key_does_not_have_seed_nor_secret_key()
     {
-        var encodedPublicKey = "ODPWIBQJVIQ42462QAFI2RKJC4RZHCQSIVPRDDHWFCJAP52NRZK6Z2YC".ToCharArray();
+        var encodedPublicKey = "ODPWIBQJVIQ42462QAFI2RKJC4RZHCQSIVPRDDHWFCJAP52NRZK6Z2YC";
 
         var pair = KeyPair.FromPublicKey(encodedPublicKey);
         Assert.Equal(encodedPublicKey, pair.GetPublicKey());
