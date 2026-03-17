@@ -350,7 +350,7 @@ public class NKeysTest(ITestOutputHelper output)
     [Fact]
     public void DecodePubCurveKey_rejects_empty_string()
     {
-        Assert.ThrowsAny<Exception>(() => KeyPair.DecodePubCurveKey(""));
+        Assert.ThrowsAny<Exception>(() => KeyPair.DecodePubCurveKey(string.Empty));
     }
 
     [Fact]
