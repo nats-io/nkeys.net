@@ -320,6 +320,11 @@ public sealed class KeyPair : IDisposable
 
         Base32.FromBase32(keySpan, buf);
 
+        if (buf[0] != (byte)PrefixByte.Curve)
+        {
+            throw new NKeysException("Not a valid curve key");
+        }
+
         var crc = (ushort)(buf[CurveDecodeLen - 2] | buf[CurveDecodeLen - 1] << 8);
         if (crc != Crc16.Checksum(buf.Slice(0, CurveDecodeLen - 2)))
         {

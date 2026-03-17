@@ -307,16 +307,10 @@ public class NKeysTest(ITestOutputHelper output)
         var raw = new byte[rawLen];
         Base32.FromBase32(publicKey.ToCharArray(), raw);
 
-        // CRC is the last 2 bytes (indices 33 and 34)
-        var crcByte1 = raw[33];
-        var crcByte2 = raw[34];
-
+        // Decoded key should be exactly raw[1..33) — the 32-byte key without prefix or CRC
         var decoded = KeyPair.DecodePubCurveKey(publicKey);
-
-        // The decoded key must not contain CRC bytes
-        // If it were 33 bytes, the last byte would be crcByte1
         Assert.Equal(32, decoded.Length);
-        Assert.NotEqual(crcByte1, decoded[31]); // would match if off-by-one bug existed
+        Assert.Equal(raw.AsSpan().Slice(1, 32).ToArray(), decoded);
     }
 
     [Fact]
@@ -329,6 +323,15 @@ public class NKeysTest(ITestOutputHelper output)
         var sealed1 = kp1.Seal(message, kp2.GetPublicKey());
         var opened = kp2.Open(sealed1, kp1.GetPublicKey());
         Assert.Equal(message, opened);
+    }
+
+    [Fact]
+    public void DecodePubCurveKey_rejects_non_curve_key()
+    {
+        // A valid User public key has the same decoded length but wrong prefix
+        var kp = KeyPair.CreatePair(PrefixByte.User);
+        var ex = Assert.Throws<NKeysException>(() => KeyPair.DecodePubCurveKey(kp.GetPublicKey()));
+        Assert.Equal("Not a valid curve key", ex.Message);
     }
 
     [Fact]
