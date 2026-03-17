@@ -231,7 +231,6 @@ public sealed class KeyPair : IDisposable
             throw new NKeysException("Curve key only operation");
         }
 
-        // TODO optimize
         var rpub = DecodePubCurveKey(receiver);
 
         var nonce = new byte[CurveNonceLen];
@@ -268,7 +267,6 @@ public sealed class KeyPair : IDisposable
             throw new NKeysException("Curve key only operation");
         }
 
-        // TODO optimize
         if (input.Length <= Vlen + CurveNonceLen)
         {
             throw new NKeysException("Encrypted input is not valid");
@@ -300,6 +298,40 @@ public sealed class KeyPair : IDisposable
         CryptoBytes.Wipe(_seed);
         CryptoBytes.Wipe(_sk);
         CryptoBytes.Wipe(_pk);
+    }
+
+    internal static byte[] DecodePubCurveKey(string key)
+    {
+        var pub = new byte[CurveKeyLen];
+        DecodePubCurveKey(key, pub);
+        return pub;
+    }
+
+    internal static void DecodePubCurveKey(string key, Span<byte> pub)
+    {
+        Span<byte> buf = stackalloc byte[CurveDecodeLen];
+        var keySpan = key.AsSpan();
+        var length = Base32.GetDataLength(keySpan);
+
+        if (length != CurveDecodeLen)
+        {
+            throw new NKeysException("Not a valid curve key");
+        }
+
+        Base32.FromBase32(keySpan, buf);
+
+        if (buf[0] != (byte)PrefixByte.Curve)
+        {
+            throw new NKeysException("Not a valid curve key");
+        }
+
+        var crc = (ushort)(buf[CurveDecodeLen - 2] | buf[CurveDecodeLen - 1] << 8);
+        if (crc != Crc16.Checksum(buf.Slice(0, CurveDecodeLen - 2)))
+        {
+            ThrowInvalidCrcException();
+        }
+
+        buf.Slice(1, CurveKeyLen).CopyTo(pub);
     }
 
     private static string Encode(byte prefixByte, bool seed, byte[] src)
@@ -443,27 +475,4 @@ public sealed class KeyPair : IDisposable
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void ThrowInvalidCurveKeyOperationException() => throw new NKeysException("Invalid curve key operation");
-
-    private static byte[] DecodePubCurveKey(string key)
-    {
-        // TODO optimize
-        var length = Base32.GetDataLength(key.ToCharArray());
-        var buf = new Span<byte>(new byte[length]);
-        Base32.FromBase32(key.ToCharArray(), buf);
-
-        if (buf.Length != CurveDecodeLen)
-        {
-            throw new NKeysException("Not a valid curve key");
-        }
-
-        var crc = (ushort)(buf[length - 2] | buf[length - 1] << 8);
-        if (crc != Crc16.Checksum(buf.Slice(0, length - 2)))
-        {
-            ThrowInvalidCrcException();
-        }
-
-        var pub = buf.Slice(1, length - 2).ToArray();
-
-        return pub;
-    }
 }
