@@ -302,6 +302,29 @@ public sealed class KeyPair : IDisposable
         CryptoBytes.Wipe(_pk);
     }
 
+    internal static byte[] DecodePubCurveKey(string key)
+    {
+        // TODO optimize
+        var length = Base32.GetDataLength(key.ToCharArray());
+        var buf = new Span<byte>(new byte[length]);
+        Base32.FromBase32(key.ToCharArray(), buf);
+
+        if (buf.Length != CurveDecodeLen)
+        {
+            throw new NKeysException("Not a valid curve key");
+        }
+
+        var crc = (ushort)(buf[length - 2] | buf[length - 1] << 8);
+        if (crc != Crc16.Checksum(buf.Slice(0, length - 2)))
+        {
+            ThrowInvalidCrcException();
+        }
+
+        var pub = buf.Slice(1, CurveKeyLen).ToArray();
+
+        return pub;
+    }
+
     private static string Encode(byte prefixByte, bool seed, byte[] src)
     {
         if (!IsValidPublicPrefixByte(prefixByte))
@@ -443,27 +466,4 @@ public sealed class KeyPair : IDisposable
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void ThrowInvalidCurveKeyOperationException() => throw new NKeysException("Invalid curve key operation");
-
-    private static byte[] DecodePubCurveKey(string key)
-    {
-        // TODO optimize
-        var length = Base32.GetDataLength(key.ToCharArray());
-        var buf = new Span<byte>(new byte[length]);
-        Base32.FromBase32(key.ToCharArray(), buf);
-
-        if (buf.Length != CurveDecodeLen)
-        {
-            throw new NKeysException("Not a valid curve key");
-        }
-
-        var crc = (ushort)(buf[length - 2] | buf[length - 1] << 8);
-        if (crc != Crc16.Checksum(buf.Slice(0, length - 2)))
-        {
-            ThrowInvalidCrcException();
-        }
-
-        var pub = buf.Slice(1, length - 2).ToArray();
-
-        return pub;
-    }
 }

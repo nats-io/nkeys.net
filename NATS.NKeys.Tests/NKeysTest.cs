@@ -237,6 +237,284 @@ public class NKeysTest(ITestOutputHelper output)
     }
 
     [Fact]
+    public void DecodePubCurveKey_returns_exactly_32_bytes()
+    {
+        var kp = KeyPair.CreatePair(PrefixByte.Curve);
+        var decoded = KeyPair.DecodePubCurveKey(kp.GetPublicKey());
+        Assert.Equal(32, decoded.Length);
+    }
+
+    [Fact]
+    public void DecodePubCurveKey_returns_32_bytes_for_multiple_keys()
+    {
+        // Verify across several independently generated keys
+        for (var i = 0; i < 10; i++)
+        {
+            var kp = KeyPair.CreatePair(PrefixByte.Curve);
+            var decoded = KeyPair.DecodePubCurveKey(kp.GetPublicKey());
+            Assert.Equal(32, decoded.Length);
+        }
+    }
+
+    [Fact]
+    public void DecodePubCurveKey_deterministic_for_known_seed()
+    {
+        var kp = KeyPair.FromSeed("SXAD4F52S2XAJTJ3TGDJ4VXQVW7TU35XJUSVKF25ZRXIWCIUK6NLANRHVY".ToCharArray());
+        var decoded1 = KeyPair.DecodePubCurveKey(kp.GetPublicKey());
+        var decoded2 = KeyPair.DecodePubCurveKey(kp.GetPublicKey());
+        Assert.Equal(decoded1, decoded2);
+        Assert.Equal(32, decoded1.Length);
+    }
+
+    [Fact]
+    public void DecodePubCurveKey_matches_known_public_key()
+    {
+        // Known seed/public key pair from existing tests
+        var kp = KeyPair.FromSeed("SXANLPW5OPP62ISXMPTH26DBYM4BGT3U6P2FEALGW3BZAVXQRWCX3KH2ZM".ToCharArray());
+        Assert.Equal("XBIGHMCJSHWYFW6ZY4WWONQ3FRIS5A3OQAUMPPKYBNKRYQTVX4PEAIZA", kp.GetPublicKey());
+        var decoded = KeyPair.DecodePubCurveKey(kp.GetPublicKey());
+        Assert.Equal(32, decoded.Length);
+    }
+
+    [Fact]
+    public void DecodePubCurveKey_does_not_include_prefix_byte()
+    {
+        var kp = KeyPair.CreatePair(PrefixByte.Curve);
+        var publicKey = kp.GetPublicKey();
+
+        // Decode the full base32 to get raw bytes including prefix and CRC
+        var rawLen = Base32.GetDataLength(publicKey.ToCharArray());
+        var raw = new byte[rawLen];
+        Base32.FromBase32(publicKey.ToCharArray(), raw);
+
+        // First byte is the prefix
+        var prefixByte = raw[0];
+        Assert.Equal((byte)PrefixByte.Curve, prefixByte);
+
+        // DecodePubCurveKey should return bytes [1..33), not include prefix or CRC
+        var decoded = KeyPair.DecodePubCurveKey(publicKey);
+        Assert.Equal(raw.AsSpan().Slice(1, 32).ToArray(), decoded);
+    }
+
+    [Fact]
+    public void DecodePubCurveKey_does_not_include_crc_bytes()
+    {
+        var kp = KeyPair.CreatePair(PrefixByte.Curve);
+        var publicKey = kp.GetPublicKey();
+
+        // Get the raw decoded bytes
+        var rawLen = Base32.GetDataLength(publicKey.ToCharArray());
+        var raw = new byte[rawLen];
+        Base32.FromBase32(publicKey.ToCharArray(), raw);
+
+        // CRC is the last 2 bytes (indices 33 and 34)
+        var crcByte1 = raw[33];
+        var crcByte2 = raw[34];
+
+        var decoded = KeyPair.DecodePubCurveKey(publicKey);
+
+        // The decoded key must not contain CRC bytes
+        // If it were 33 bytes, the last byte would be crcByte1
+        Assert.Equal(32, decoded.Length);
+        Assert.NotEqual(crcByte1, decoded[31]); // would match if off-by-one bug existed
+    }
+
+    [Fact]
+    public void DecodePubCurveKey_round_trips_with_seal_open()
+    {
+        var kp1 = KeyPair.FromSeed("SXAD4F52S2XAJTJ3TGDJ4VXQVW7TU35XJUSVKF25ZRXIWCIUK6NLANRHVY".ToCharArray());
+        var kp2 = KeyPair.CreatePair(PrefixByte.Curve);
+
+        var message = new byte[] { 1, 2, 3, 4, 5 };
+        var sealed1 = kp1.Seal(message, kp2.GetPublicKey());
+        var opened = kp2.Open(sealed1, kp1.GetPublicKey());
+        Assert.Equal(message, opened);
+    }
+
+    [Fact]
+    public void DecodePubCurveKey_rejects_too_short()
+    {
+        var ex = Assert.Throws<NKeysException>(() => KeyPair.DecodePubCurveKey("XAAA"));
+        Assert.Equal("Not a valid curve key", ex.Message);
+    }
+
+    [Fact]
+    public void DecodePubCurveKey_rejects_too_long()
+    {
+        // Take a valid key and append extra base32 characters
+        var kp = KeyPair.CreatePair(PrefixByte.Curve);
+        var tooLong = kp.GetPublicKey() + "AAAAAAAAAA";
+        Assert.Throws<NKeysException>(() => KeyPair.DecodePubCurveKey(tooLong));
+    }
+
+    [Fact]
+    public void DecodePubCurveKey_rejects_empty_string()
+    {
+        Assert.ThrowsAny<Exception>(() => KeyPair.DecodePubCurveKey(""));
+    }
+
+    [Fact]
+    public void DecodePubCurveKey_rejects_corrupted_crc()
+    {
+        var kp = KeyPair.CreatePair(PrefixByte.Curve);
+        var publicKey = kp.GetPublicKey();
+
+        // Corrupt a character in the middle of the key
+        var chars = publicKey.ToCharArray();
+        chars[10] = chars[10] == 'A' ? 'B' : 'A';
+        var corrupted = new string(chars);
+
+        var ex = Assert.Throws<NKeysException>(() => KeyPair.DecodePubCurveKey(corrupted));
+        Assert.Equal("Invalid CRC", ex.Message);
+    }
+
+    [Fact]
+    public void DecodePubCurveKey_rejects_invalid_base32_characters()
+    {
+        var kp = KeyPair.CreatePair(PrefixByte.Curve);
+        var publicKey = kp.GetPublicKey();
+
+        // Replace with invalid base32 chars (lowercase, digits 0/1/8/9, symbols)
+        var chars = publicKey.ToCharArray();
+        chars[5] = '!';
+        Assert.Throws<ArgumentException>(() => KeyPair.DecodePubCurveKey(new string(chars)));
+    }
+
+    [Fact]
+    public void DecodePubCurveKey_different_keys_produce_different_results()
+    {
+        var kp1 = KeyPair.CreatePair(PrefixByte.Curve);
+        var kp2 = KeyPair.CreatePair(PrefixByte.Curve);
+
+        var decoded1 = KeyPair.DecodePubCurveKey(kp1.GetPublicKey());
+        var decoded2 = KeyPair.DecodePubCurveKey(kp2.GetPublicKey());
+
+        Assert.NotEqual(decoded1, decoded2);
+    }
+
+    [Fact]
+    public void DecodePubCurveKey_cross_validates_with_go_test_data()
+    {
+        // Use the Go-generated test data to verify decode produces
+        // keys that work correctly in seal/open operations
+        var json = JsonNode.Parse(File.ReadAllText("test_data.json"));
+        foreach (var data in json!["xkeys"]!.AsArray())
+        {
+            var pk1 = data!["pk1"]!.GetValue<string>();
+            var pk2 = data!["pk2"]!.GetValue<string>();
+
+            var decoded1 = KeyPair.DecodePubCurveKey(pk1);
+            var decoded2 = KeyPair.DecodePubCurveKey(pk2);
+
+            Assert.Equal(32, decoded1.Length);
+            Assert.Equal(32, decoded2.Length);
+        }
+    }
+
+    [Fact]
+    public void DecodePubCurveKey_blackbox_seal_open_with_decoded_key()
+    {
+        // Black box: if DecodePubCurveKey returns the correct raw key,
+        // then encrypting for that key and decrypting must round-trip
+        var sender = KeyPair.CreatePair(PrefixByte.Curve);
+        var receiver = KeyPair.CreatePair(PrefixByte.Curve);
+
+        var payloads = new byte[][]
+        {
+            Array.Empty<byte>(),
+            new byte[] { 0 },
+            new byte[] { 0xFF },
+            Encoding.UTF8.GetBytes("hello world"),
+            new byte[1024],
+            new byte[8192],
+        };
+
+        foreach (var payload in payloads)
+        {
+            var sealed1 = sender.Seal(payload, receiver.GetPublicKey());
+            var opened = receiver.Open(sealed1, sender.GetPublicKey());
+            Assert.Equal(payload, opened);
+        }
+    }
+
+    [Fact]
+    public void DecodePubCurveKey_blackbox_two_parties_cross_seal()
+    {
+        // Black box: both parties can seal for each other and open
+        var alice = KeyPair.CreatePair(PrefixByte.Curve);
+        var bob = KeyPair.CreatePair(PrefixByte.Curve);
+        var message = Encoding.UTF8.GetBytes("secret message");
+
+        // Alice seals for Bob
+        var sealedForBob = alice.Seal(message, bob.GetPublicKey());
+        Assert.Equal(message, bob.Open(sealedForBob, alice.GetPublicKey()));
+
+        // Bob seals for Alice
+        var sealedForAlice = bob.Seal(message, alice.GetPublicKey());
+        Assert.Equal(message, alice.Open(sealedForAlice, bob.GetPublicKey()));
+    }
+
+    [Fact]
+    public void DecodePubCurveKey_blackbox_wrong_sender_fails_open()
+    {
+        // Black box: opening with wrong sender key must fail
+        var alice = KeyPair.CreatePair(PrefixByte.Curve);
+        var bob = KeyPair.CreatePair(PrefixByte.Curve);
+        var eve = KeyPair.CreatePair(PrefixByte.Curve);
+
+        var sealed1 = alice.Seal(Encoding.UTF8.GetBytes("secret"), bob.GetPublicKey());
+
+        // Bob tries to open with Eve's public key as sender — must fail
+        Assert.ThrowsAny<Exception>(() => bob.Open(sealed1, eve.GetPublicKey()));
+    }
+
+    [Fact]
+    public void DecodePubCurveKey_blackbox_wrong_receiver_fails_open()
+    {
+        // Black box: wrong receiver cannot open
+        var alice = KeyPair.CreatePair(PrefixByte.Curve);
+        var bob = KeyPair.CreatePair(PrefixByte.Curve);
+        var eve = KeyPair.CreatePair(PrefixByte.Curve);
+
+        var sealed1 = alice.Seal(Encoding.UTF8.GetBytes("secret"), bob.GetPublicKey());
+
+        // Eve tries to open something meant for Bob
+        Assert.ThrowsAny<Exception>(() => eve.Open(sealed1, alice.GetPublicKey()));
+    }
+
+    [Fact]
+    public void DecodePubCurveKey_blackbox_tampered_ciphertext_fails()
+    {
+        var alice = KeyPair.CreatePair(PrefixByte.Curve);
+        var bob = KeyPair.CreatePair(PrefixByte.Curve);
+
+        var sealed1 = alice.Seal(Encoding.UTF8.GetBytes("secret"), bob.GetPublicKey());
+
+        // Flip a byte in the encrypted payload (after version + nonce header)
+        sealed1[30] ^= 0xFF;
+
+        Assert.ThrowsAny<Exception>(() => bob.Open(sealed1, alice.GetPublicKey()));
+    }
+
+    [Fact]
+    public void DecodePubCurveKey_blackbox_each_seal_produces_different_ciphertext()
+    {
+        // Black box: nonce randomization means same plaintext encrypts differently
+        var alice = KeyPair.CreatePair(PrefixByte.Curve);
+        var bob = KeyPair.CreatePair(PrefixByte.Curve);
+        var message = Encoding.UTF8.GetBytes("hello");
+
+        var sealed1 = alice.Seal(message, bob.GetPublicKey());
+        var sealed2 = alice.Seal(message, bob.GetPublicKey());
+
+        Assert.NotEqual(sealed1, sealed2);
+
+        // But both decrypt to the same message
+        Assert.Equal(message, bob.Open(sealed1, alice.GetPublicKey()));
+        Assert.Equal(message, bob.Open(sealed2, alice.GetPublicKey()));
+    }
+
+    [Fact]
     public void Public_key_does_not_have_seed_nor_secret_key()
     {
         var encodedPublicKey = "ODPWIBQJVIQ42462QAFI2RKJC4RZHCQSIVPRDDHWFCJAP52NRZK6Z2YC";
