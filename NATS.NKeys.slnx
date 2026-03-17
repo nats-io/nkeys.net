@@ -1,0 +1,24 @@
+<Solution>
+  <Project Path="NATS.NKeys/NATS.NKeys.csproj" />
+  <Project Path="NATS.NKeys.Tests/NATS.NKeys.Tests.csproj" />
+  <Project Path="NATS.NKeys.NaCl.Tests/NATS.NKeys.NaCl.Tests.csproj" />
+  <Project Path="NATS.NKeys.CheckNativeAot/NATS.NKeys.CheckNativeAot.csproj" />
+  <Folder Name="/Solution Items/github/" />
+  <Folder Name="/Solution Items/github/workflows/">
+    <File Path=".github/workflows/format.yml" />
+    <File Path=".github/workflows/release.yml" />
+    <File Path=".github/workflows/test.yml" />
+  </Folder>
+  <Project Path="NATS.NKeys.Benchmarks/NATS.NKeys.Benchmarks.csproj" />
+  <Project Path="nkTestGen/nkTestGen.csproj" />
+  <Folder Name="/Solution Items/">
+    <File Path="README.md" />
+    <File Path="LICENSE" />
+    <File Path=".editorconfig" />
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
+    <File Path="Icon.png" />
+    <File Path="version.txt" />
+  </Folder>
+</Solution>

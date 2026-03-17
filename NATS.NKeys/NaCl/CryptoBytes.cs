@@ -374,11 +374,12 @@ namespace NATS.NKeys.NaCl
             // Leading zero bytes get encoded as leading `1` characters
             var leadingZeroCount = input.TakeWhile(c => c == '1').Count();
             var leadingZeros = Enumerable.Repeat((byte)0, leadingZeroCount);
-            var bytesWithoutLeadingZeros =
-                intData.ToByteArray()
-                .Reverse()// to big endian
+            var bytesWithoutLeadingZeros = intData.ToByteArray();
+            Array.Reverse(bytesWithoutLeadingZeros);
+            var bytesWithoutLeadingZerosTrimmed = bytesWithoutLeadingZeros
+                .AsEnumerable()
                 .SkipWhile(b => b == 0);//strip sign byte
-            var result = leadingZeros.Concat(bytesWithoutLeadingZeros).ToArray();
+            var result = leadingZeros.Concat(bytesWithoutLeadingZerosTrimmed).ToArray();
             return result;
         }
     }
