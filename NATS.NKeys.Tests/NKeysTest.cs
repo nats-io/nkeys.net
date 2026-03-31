@@ -31,6 +31,9 @@ public class NKeysTest(ITestOutputHelper output)
         Assert.Equal("XBKXUQXILUXDDHTWEDECINN24IUYFQAYG737MB5PMEAVMUMHCIWRA3UD", kp.GetPublicKey());
         var exception = Assert.Throws<NKeysException>(() => kp.Sign(default, default));
         Assert.Equal("Invalid curve key operation", exception.Message);
+
+        var exception2 = Assert.Throws<NKeysException>(() => kp.Verify(default, default));
+        Assert.Equal("Invalid curve key operation", exception2.Message);
     }
 
     [Fact]
