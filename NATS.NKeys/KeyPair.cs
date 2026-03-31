@@ -267,7 +267,7 @@ public sealed class KeyPair : IDisposable
             throw new NKeysException("Curve key only operation");
         }
 
-        if (input.Length <= Vlen + CurveNonceLen)
+        if (input.Length < Vlen + CurveNonceLen + TweetNaCl.BoxBoxZeroBytes)
         {
             throw new NKeysException("Encrypted input is not valid");
         }
@@ -282,7 +282,14 @@ public sealed class KeyPair : IDisposable
         Array.Copy(input, Vlen, nonce, 0, CurveNonceLen);
         var spub = DecodePubCurveKey(sender);
 
-        return TweetNaCl.CryptoBoxOpen(input.AsSpan().Slice(Vlen + CurveNonceLen).ToArray(), nonce, spub, _seed)!;
+        try
+        {
+            return TweetNaCl.CryptoBoxOpen(input.AsSpan().Slice(Vlen + CurveNonceLen).ToArray(), nonce, spub, _seed)!;
+        }
+        catch (Exception ex) when (ex is not NKeysException)
+        {
+            throw new NKeysException("Decryption failed");
+        }
     }
 
     /// <summary>
