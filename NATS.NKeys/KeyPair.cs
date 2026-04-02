@@ -286,9 +286,9 @@ public sealed class KeyPair : IDisposable
         {
             return TweetNaCl.CryptoBoxOpen(input.AsSpan().Slice(Vlen + CurveNonceLen).ToArray(), nonce, spub, _seed)!;
         }
-        catch (TweetNaCl.NKeyNaclException)
+        catch (TweetNaCl.NKeyNaclException ex)
         {
-            throw new NKeysException("Decryption failed");
+            throw new NKeysException("Decryption failed", ex);
         }
     }
 
