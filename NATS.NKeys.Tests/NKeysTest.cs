@@ -471,7 +471,7 @@ public class NKeysTest(ITestOutputHelper output)
         var sealed1 = alice.Seal(Encoding.UTF8.GetBytes("secret"), bob.GetPublicKey());
 
         // Bob tries to open with Eve's public key as sender — must fail
-        Assert.ThrowsAny<Exception>(() => bob.Open(sealed1, eve.GetPublicKey()));
+        Assert.Throws<NKeysException>(() => bob.Open(sealed1, eve.GetPublicKey()));
     }
 
     [Fact]
@@ -485,7 +485,7 @@ public class NKeysTest(ITestOutputHelper output)
         var sealed1 = alice.Seal(Encoding.UTF8.GetBytes("secret"), bob.GetPublicKey());
 
         // Eve tries to open something meant for Bob
-        Assert.ThrowsAny<Exception>(() => eve.Open(sealed1, alice.GetPublicKey()));
+        Assert.Throws<NKeysException>(() => eve.Open(sealed1, alice.GetPublicKey()));
     }
 
     [Fact]
@@ -499,7 +499,7 @@ public class NKeysTest(ITestOutputHelper output)
         // Flip a byte in the encrypted payload (after version + nonce header)
         sealed1[30] ^= 0xFF;
 
-        Assert.ThrowsAny<Exception>(() => bob.Open(sealed1, alice.GetPublicKey()));
+        Assert.Throws<NKeysException>(() => bob.Open(sealed1, alice.GetPublicKey()));
     }
 
     [Fact]
@@ -518,6 +518,29 @@ public class NKeysTest(ITestOutputHelper output)
         // But both decrypt to the same message
         Assert.Equal(message, bob.Open(sealed1, alice.GetPublicKey()));
         Assert.Equal(message, bob.Open(sealed2, alice.GetPublicKey()));
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(28)]
+    [InlineData(29)]
+    [InlineData(43)]
+    public void Open_rejects_short_input(int length)
+    {
+        var kp = KeyPair.CreatePair(PrefixByte.Curve);
+        var input = new byte[length];
+
+        // Fill with valid version header if long enough
+        if (length >= 4)
+        {
+            input[0] = (byte)'x';
+            input[1] = (byte)'k';
+            input[2] = (byte)'v';
+            input[3] = (byte)'1';
+        }
+
+        var ex = Assert.Throws<NKeysException>(() => kp.Open(input, kp.GetPublicKey()));
+        Assert.Equal("Encrypted input is not valid", ex.Message);
     }
 
     [Fact]
