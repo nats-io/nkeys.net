@@ -207,6 +207,9 @@ public sealed class KeyPair : IDisposable
     /// </returns>
     public bool Verify(ReadOnlyMemory<byte> message, ReadOnlyMemory<byte> signature)
     {
+        if (_type == PrefixByte.Curve)
+            ThrowInvalidCurveKeyOperationException();
+
         if (!MemoryMarshal.TryGetArray(message, out var messageArray))
             ThrowCouldNotGetArrayException(nameof(message));
 
