@@ -185,7 +185,14 @@ internal class TweetNaCl
     public static Byte[] CryptoBoxBeforenm(Byte[] publicKey, Byte[] secretKey)
     {
         Byte[] s = CryptoScalarmult(secretKey, publicKey);
-        return CryptoCoreHSalsa20(_0, s, Sigma);
+        try
+        {
+            return CryptoCoreHSalsa20(_0, s, Sigma);
+        }
+        finally
+        {
+            Array.Clear(s, 0, s.Length);
+        }
     }
 
     /// <summary>
@@ -231,7 +238,14 @@ internal class TweetNaCl
     public static Byte[] CryptoBox(Byte[] message, Byte[] nonce, Byte[] publicKey, Byte[] secretKey)
     {
         Byte[] k = CryptoBoxBeforenm(publicKey, secretKey);
-        return CryptoBoxAfternm(message, nonce, k);
+        try
+        {
+            return CryptoBoxAfternm(message, nonce, k);
+        }
+        finally
+        {
+            Array.Clear(k, 0, k.Length);
+        }
     }
 
     /// <summary>
@@ -249,7 +263,14 @@ internal class TweetNaCl
     public static Byte[] CryptoBoxOpen(Byte[] cipheredMessage, Byte[] nonce, Byte[] publicKey, Byte[] secretKey)
     {
         Byte[] k = CryptoBoxBeforenm(publicKey, secretKey);
-        return CryptoBoxOpenAfternm(cipheredMessage, nonce, k);
+        try
+        {
+            return CryptoBoxOpenAfternm(cipheredMessage, nonce, k);
+        }
+        finally
+        {
+            Array.Clear(k, 0, k.Length);
+        }
     }
 
     /// <summary>

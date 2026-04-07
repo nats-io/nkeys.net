@@ -75,9 +75,10 @@ namespace NATS.NKeys.NaCl.Internal.Ed25519Ref10
             byte[] m, int moffset, int mlen,
             byte[] sk, int skoffset)
         {
-            byte[] az, r, hram;
+            byte[] az = null, r = null, hram = null;
             GroupElementP3 R;
-            var hasher = new Sha512();
+            using var hasher = new Sha512();
+            try
             {
                 hasher.Update(sk, skoffset, 32);
                 az = hasher.Finalize();
@@ -104,6 +105,12 @@ namespace NATS.NKeys.NaCl.Internal.Ed25519Ref10
                 NATS.NKeys.NaCl.Internal.Ed25519Ref10.ScalarOperations.sc_muladd(s, hram, az, r);
                 Array.Copy(s, 0, sig, sigoffset + 32, 32);
                 CryptoBytes.Wipe(s);
+            }
+            finally
+            {
+                if (az != null) CryptoBytes.Wipe(az);
+                if (r != null) CryptoBytes.Wipe(r);
+                if (hram != null) CryptoBytes.Wipe(hram);
             }
         }
     }

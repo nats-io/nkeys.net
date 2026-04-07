@@ -20,61 +20,67 @@ namespace X25519
         private static byte[] ScalarMult(byte[] input, byte[] baseIn)
         {
             var e = new byte[32];
+            try
+            {
+                Array.Copy(input,e,32); //copy(e[:], input[:])
+                e[0] &= 248;
+                e[31] &= 127;
+                e[31] |= 64;
 
-            Array.Copy(input,e,32); //copy(e[:], input[:])
-            e[0] &= 248;
-            e[31] &= 127;
-            e[31] |= 64;
+                FieldElement x1, x2, z2, x3, z3, tmp0, tmp1;
+                z2 = new FieldElement();
+                // feFromBytes(&x1, base)
+                x1 = new FieldElement(baseIn); //SECOND NUMBER
+                //feOne(&x2)
+                x2 = new FieldElement();
+                x2.One();
+                //feCopy(&x3, &x1)
+                x3 = new FieldElement();
+                FieldElement.Copy(ref x3,x1);
+                //feOne(&z3)
+                z3 = new FieldElement();
+                z3.One();
 
-            FieldElement x1, x2, z2, x3, z3, tmp0, tmp1;
-            z2 = new FieldElement();
-            // feFromBytes(&x1, base)
-            x1 = new FieldElement(baseIn); //SECOND NUMBER
-            //feOne(&x2)
-            x2 = new FieldElement();
-            x2.One();
-            //feCopy(&x3, &x1)
-            x3 = new FieldElement();
-            FieldElement.Copy(ref x3,x1);
-            //feOne(&z3)
-            z3 = new FieldElement();
-            z3.One();
+                int swap = 0;
+                for (int pos = 254; pos >= 0; pos--) {
+                    byte b = Convert.ToByte(e[pos / 8] >> (pos & 7));
+                    b &= 1;
+                    swap ^= (int)(b);
+                    FieldElement.CSwap(ref x2, ref x3, swap);
+                    FieldElement.CSwap(ref z2, ref z3, swap);
+                    swap = (int) (b);
 
-            int swap = 0;
-            for (int pos = 254; pos >= 0; pos--) {
-                byte b = Convert.ToByte(e[pos / 8] >> (pos & 7));
-                b &= 1;
-                swap ^= (int)(b);
+                    tmp0 = x3 - z3; //feSub(&tmp0, &x3, &z3)
+                    tmp1 = x2 - z2; //feSub(&tmp1, &x2, &z2)
+                    x2 += z2; //feAdd(&x2, &x2, &z2)
+                    z2 = x3 + z3; //feAdd(&z2, &x3, &z3)
+                    z3 = tmp0.Multiply(x2);
+                    z2 = z2.Multiply(tmp1);
+                    tmp0 = tmp1.Square();
+                    tmp1 = x2.Square();
+                    x3 = z3 + z2; //feAdd(&x3, &z3, &z2)
+                    z2 = z3 - z2; //feSub(&z2, &z3, &z2)
+                    x2 = tmp1.Multiply(tmp0);
+                    tmp1 -= tmp0;//feSub(&tmp1, &tmp1, &tmp0)
+                    z2 = z2.Square();
+                    z3 = tmp1.Mul121666();
+                    x3 = x3.Square();
+                    tmp0 += z3; //feAdd(&tmp0, &tmp0, &z3)
+                    z3 = x1.Multiply(z2);
+                    z2 = tmp1.Multiply(tmp0);
+                }
+
                 FieldElement.CSwap(ref x2, ref x3, swap);
                 FieldElement.CSwap(ref z2, ref z3, swap);
-                swap = (int) (b);
 
-                tmp0 = x3 - z3; //feSub(&tmp0, &x3, &z3)
-                tmp1 = x2 - z2; //feSub(&tmp1, &x2, &z2)
-                x2 += z2; //feAdd(&x2, &x2, &z2)
-                z2 = x3 + z3; //feAdd(&z2, &x3, &z3)
-                z3 = tmp0.Multiply(x2);
-                z2 = z2.Multiply(tmp1);
-                tmp0 = tmp1.Square();
-                tmp1 = x2.Square();
-                x3 = z3 + z2; //feAdd(&x3, &z3, &z2)
-                z2 = z3 - z2; //feSub(&z2, &z3, &z2)
-                x2 = tmp1.Multiply(tmp0);
-                tmp1 -= tmp0;//feSub(&tmp1, &tmp1, &tmp0)
-                z2 = z2.Square();
-                z3 = tmp1.Mul121666();
-                x3 = x3.Square();
-                tmp0 += z3; //feAdd(&tmp0, &tmp0, &z3)
-                z3 = x1.Multiply(z2);
-                z2 = tmp1.Multiply(tmp0);
+                z2 = z2.Invert();
+                x2 = x2.Multiply(z2);
+                return x2.ToBytes();
             }
-
-            FieldElement.CSwap(ref x2, ref x3, swap);
-            FieldElement.CSwap(ref z2, ref z3, swap);
-
-            z2 = z2.Invert();
-            x2 = x2.Multiply(z2);
-            return x2.ToBytes();
+            finally
+            {
+                Array.Clear(e, 0, e.Length);
+            }
         }
         /// <summary>
         /// X25519 returns the result of the scalar multiplication (scalar * point),
