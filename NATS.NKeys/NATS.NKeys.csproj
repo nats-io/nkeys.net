@@ -7,8 +7,8 @@
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
         <!-- NuGet Packaging -->
-        <PackageTags>nkeys</PackageTags>
-        <Description>NKeys for .NET.</Description>
+        <PackageTags>nats nkeys ed25519 authentication security cryptography signing public-key messaging</PackageTags>
+        <Description>NATS NKeys: Ed25519 public-key signature library for the NATS .NET ecosystem. Create key pairs, sign, and verify messages for NATS authentication.</Description>
         <IsPackable>true</IsPackable>
     </PropertyGroup>
 
