@@ -1,10 +1,16 @@
-# NKeys .NET
+# NATS .NET NKeys
 
 [![Build and Test](https://github.com/nats-io/nkeys.net/actions/workflows/test.yml/badge.svg)](https://github.com/nats-io/nkeys.net/actions/workflows/test.yml)
 [![NuGet](https://img.shields.io/nuget/v/NATS.NKeys.svg)](https://www.nuget.org/packages/NATS.NKeys/)
 
-NKeys is a public-key signature system based on [Ed25519](
-https://ed25519.cr.yp.to/) for the [NATS](https://nats.io/) ecosystem.
+NKeys is an [Ed25519](https://ed25519.cr.yp.to/) public-key signature system
+for [NATS](https://nats.io/) authentication and security.
+
+## Install
+
+```shell
+dotnet add package NATS.NKeys
+```
 
 ## Usage
 
@@ -56,7 +62,5 @@ Assert.False(pair2.Verify(corrupt, signature));
 
 ## About
 
-A public-key signature system based on [Ed25519](https://ed25519.cr.yp.to/) for
-the [NATS](https://nats.io/) ecosystem.
-
-See also https://github.com/nats-io/nkeys
+Part of the [NATS](https://nats.io/) ecosystem. See also the reference
+[Go implementation](https://github.com/nats-io/nkeys).
