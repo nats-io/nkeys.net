@@ -6,6 +6,9 @@ on:
   # to be removed. only needed for the initial setup. running on pull requests is enough.
   push: { branches: [ main ] }
 
+permissions:
+  contents: read
+
 jobs:
   check:
     name: check
